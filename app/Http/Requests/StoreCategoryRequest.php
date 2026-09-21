@@ -5,13 +5,14 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Closure;
 use Illuminate\Support\Facades\DB;
+use App\Models\Category;
 
 class StoreCategoryRequest extends FormRequest
 {
     public function authorize(): bool
-    {
-        return false;
-    }
+{
+    return $this->user()?->can('create', Category::class) ?? false;
+}
 
     protected function prepareForValidation(): void
     {
