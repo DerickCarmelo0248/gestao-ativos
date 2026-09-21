@@ -71,4 +71,40 @@ public function test_guest_is_redirected_to_login(): void
         'name' => 'Categoria bloqueada',
     ])->assertRedirect(route('login'));
 }
+
+public function test_admin_can_view_categories(): void
+{
+    $user = new User();
+    $user->role = 'admin';
+
+    $this->assertTrue(
+        $user->can('viewAny', \App\Models\Category::class)
+    );
+}
+
+public function test_operator_can_view_categories(): void
+{
+    $user = new User();
+    $user->role = 'operator';
+
+    $this->assertTrue(
+        $user->can('viewAny', \App\Models\Category::class)
+    );
+}
+
+public function test_unknown_role_cannot_view_categories(): void
+{
+    $user = new User();
+    $user->role = 'unknown';
+
+    $this->assertFalse(
+        $user->can('viewAny', \App\Models\Category::class)
+    );
+}
+
+public function test_guest_cannot_open_category_listing(): void
+{
+    $this->get(route('categories.index'))
+        ->assertRedirect(route('login'));
+}
 }

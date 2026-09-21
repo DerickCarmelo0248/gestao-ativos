@@ -28,4 +28,7 @@ Route::post('/categories', [CategoryController::class, 'store'])
 
     Route::post('/logout', [LoginController::class, 'destroy'])
         ->name('logout');
+
+        Route::get('/categories', [CategoryController::class, 'index'])
+    ->name('categories.index');
 });

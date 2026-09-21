@@ -21,6 +21,14 @@
     </p>
 @endcan
 
+@can('viewAny', \App\Models\Category::class)
+    <p>
+        <a href="{{ route('categories.index') }}">
+            Consultar categorias
+        </a>
+    </p>
+@endcan
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit">Sair</button>

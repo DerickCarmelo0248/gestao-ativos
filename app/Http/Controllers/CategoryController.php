@@ -12,6 +12,18 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
+public function index(): View
+{
+    Gate::authorize('viewAny', Category::class);
+
+    $categories = Category::query()
+        ->orderBy('name')
+        ->orderBy('id')
+        ->paginate(15);
+
+    return view('categories.index', compact('categories'));
+}
+
     public function create(): View
     {
         Gate::authorize('create', Category::class);
