@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AssetBatchController;
+use App\Http\Controllers\AssetController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,4 +46,11 @@ Route::post('/items', [ItemController::class, 'store'])
 
 Route::post('/assets/batch', [AssetBatchController::class, 'store'])
     ->name('assets.batch.store');
+
+    Route::get('/assets', [AssetController::class, 'index'])
+    ->name('assets.index');
+
+    Route::get('/assets/{asset}', [AssetController::class, 'show'])
+    ->whereNumber('asset')
+    ->name('assets.show');
 });

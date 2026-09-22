@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\Asset;
 
 class AssetPolicy
 {
@@ -10,4 +11,14 @@ class AssetPolicy
     {
         return in_array($user->role, ['admin', 'operator'], true);
     }
+
+    public function viewAny(User $user): bool
+    {
+    return in_array($user->role, ['admin', 'operator'], true);
+    }
+
+    public function view(User $user, Asset $asset): bool
+    {
+        return in_array($user->role, ['admin', 'operator'], true);
+    }  
 }
