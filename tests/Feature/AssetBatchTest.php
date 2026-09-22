@@ -152,7 +152,20 @@ class AssetBatchTest extends TestCase
             'code' => "T-{$suffix}",
             'name' => 'Unidade de teste',
         ]);
+$establishmentId = DB::table('establishments')->insertGetId([
+    'code' => (string) random_int(100000000, 999999999),
+    'name' => 'Estabelecimento de teste',
+    'is_active' => true,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
 
+$sectorId = DB::table('sectors')->insertGetId([
+    'name' => "Setor {$suffix}",
+    'is_active' => true,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
         $this->actingAs($user);
 
         $data = [
@@ -160,12 +173,16 @@ class AssetBatchTest extends TestCase
             'unit_id' => $unit->id,
             'patrimony_start' => '200',
             'patrimony_end' => '100',
+            'has_destination' => '1',
+            'destination_establishment_id' => $establishmentId,
+            'destination_sector_id' => $sectorId,
         ];
 
         // Intervalo invertido.
         $this->postJson(route('assets.batch.store'), $data)
             ->assertUnprocessable()
             ->assertJsonValidationErrors('patrimony_end');
+            
 
         // Intervalo com 501 equipamentos.
         $data['patrimony_start'] = '1000';
@@ -197,6 +214,22 @@ class AssetBatchTest extends TestCase
         $assetIds = Asset::where('item_id', $item->id)->pluck('id');
 
         $this->assertCount(3, $assetIds);
+
+        $movements = DB::table('asset_movements')
+    ->whereIn('asset_id', $assetIds)
+    ->get();
+
+foreach ($movements as $movement) {
+    $this->assertSame(
+        $establishmentId,
+        $movement->destination_establishment_id
+    );
+
+    $this->assertSame(
+        $sectorId,
+        $movement->destination_sector_id
+    );
+}
 
         $this->assertSame(
             3,

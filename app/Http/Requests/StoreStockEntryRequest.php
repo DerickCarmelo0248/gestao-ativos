@@ -46,7 +46,30 @@ class StoreStockEntryRequest extends FormRequest
                 'string',
                 'max:2000',
             ],
+        'has_destination' => [
+    'sometimes',
+    'boolean',
+],
+'destination_establishment_id' => [
+    'exclude_unless:has_destination,1',
+    'bail',
+    'required',
+    'integer',
+    Rule::exists('establishments', 'id')
+        ->where('is_active', true),
+],
+'destination_sector_id' => [
+    'exclude_unless:has_destination,1',
+    'bail',
+    'required',
+    'integer',
+    Rule::exists('sectors', 'id')
+        ->where('is_active', true),
+],
         ];
+
+
+
     }
 
     public function messages(): array
@@ -60,7 +83,13 @@ class StoreStockEntryRequest extends FormRequest
             'quantity.max' => 'Cada entrada pode registrar até 10.000 unidades.',
             'notes.string' => 'A observação deve ser um texto.',
             'notes.max' => 'A observação deve ter até 2.000 caracteres.',
+            'has_destination.boolean' => 'Informe se o material tem destino definido.',
+            'destination_unit_id.exists' => 'Selecione uma unidade de destino ativa.',
+            'destination_sector.string' => 'O setor deve ser um texto.',
+            'destination_sector.max' => 'O setor deve ter até 150 caracteres.',
         ];
+
+        
     }
 
     public function attributes(): array
@@ -69,7 +98,11 @@ class StoreStockEntryRequest extends FormRequest
             'item_id' => 'item',
             'unit_id' => 'unidade',
             'quantity' => 'quantidade',
-            'notes' => 'observação',
+            'notes' => 'observação','has_destination' => 'destino definido',
+            'destination_unit_id' => 'unidade de destino',
+            'destination_sector' => 'setor de destino',
         ];
+
+        
     }
 }

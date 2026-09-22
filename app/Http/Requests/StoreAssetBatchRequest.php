@@ -57,6 +57,27 @@ class StoreAssetBatchRequest extends FormRequest
                 'string',
                 'regex:/\A[0-9]{1,9}\z/',
             ],
+
+            'has_destination' => [
+                'sometimes',
+                'boolean',
+            ],
+            'destination_establishment_id' => [
+                'exclude_unless:has_destination,1',
+                'bail',
+                'required',
+                'integer',
+                Rule::exists('establishments', 'id')
+                    ->where('is_active', true),
+            ],
+            'destination_sector_id' => [
+                'exclude_unless:has_destination,1',
+                'bail',
+                'required',
+                'integer',
+                Rule::exists('sectors', 'id')
+                    ->where('is_active', true),
+            ],
         ];
     }
 
@@ -131,6 +152,11 @@ class StoreAssetBatchRequest extends FormRequest
             'unit_id.exists' => 'Selecione uma unidade ativa.',
             'patrimony_start.regex' => 'O patrimônio inicial deve conter de 1 a 9 dígitos.',
             'patrimony_end.regex' => 'O patrimônio final deve conter de 1 a 9 dígitos.',
+            'has_destination.boolean' => 'Informe se os equipamentos têm destino definido.',
+            'destination_establishment_id.integer' => 'Selecione um estabelecimento válido.',
+            'destination_establishment_id.exists' => 'Selecione um estabelecimento ativo.',
+            'destination_sector_id.integer' => 'Selecione um setor válido.',
+            'destination_sector_id.exists' => 'Selecione um setor ativo.',
         ];
     }
 
@@ -141,6 +167,9 @@ class StoreAssetBatchRequest extends FormRequest
             'unit_id' => 'unidade',
             'patrimony_start' => 'patrimônio inicial',
             'patrimony_end' => 'patrimônio final',
+            'has_destination' => 'destino definido',
+            'destination_establishment_id' => 'estabelecimento de destino',
+            'destination_sector_id' => 'setor de destino',
         ];
     }
 }

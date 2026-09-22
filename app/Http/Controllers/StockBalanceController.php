@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StockBalance;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use App\Models\StockMovement;
 
 class StockBalanceController extends Controller
 {
@@ -19,5 +20,35 @@ class StockBalanceController extends Controller
             ->paginate(15);
 
         return view('stock-balances.index', compact('balances'));
+    }
+
+    public function show(StockBalance $stockBalance): View
+    {
+        Gate::authorize('view', $stockBalance);
+
+        $stockBalance->load(['item', 'unit']);
+
+        $movements = StockMovement::query()
+            ->where('item_id', $stockBalance->item_id)
+            ->where('unit_id', $stockBalance->unit_id)
+            ->with([
+                'user',
+                'destinationEstablishment',
+                'destinationSector',
+                'legacyDestinationUnit',
+            ])
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        $movementTypes = [
+            'entry' => 'Entrada',
+        ];
+
+        return view('stock-balances.show', compact(
+            'stockBalance',
+            'movements',
+            'movementTypes'
+        ));
     }
 }

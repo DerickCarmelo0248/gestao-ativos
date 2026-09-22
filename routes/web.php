@@ -64,4 +64,11 @@ Route::post('/stock-entries', [StockEntryController::class, 'store'])
 
     Route::get('/stock-balances', [StockBalanceController::class, 'index'])
     ->name('stock-balances.index');
+
+    Route::get(
+    '/stock-balances/{stockBalance}',
+    [StockBalanceController::class, 'show']
+)
+    ->whereNumber('stockBalance')
+    ->name('stock-balances.show');
 });

@@ -79,6 +79,8 @@ class RegisterAssetBatch
                         'notes' => null,
                         'created_at' => $occurredAt,
                         'updated_at' => $occurredAt,
+                        'destination_establishment_id' => $data['destination_establishment_id'] ?? null,
+                        'destination_sector_id' => $data['destination_sector_id'] ?? null,
                     ]);
 
                     $quantity++;

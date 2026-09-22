@@ -21,4 +21,28 @@ class AssetMovement extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function destinationEstablishment(): BelongsTo
+{
+    return $this->belongsTo(
+        Establishment::class,
+        'destination_establishment_id'
+    );
+}
+
+public function destinationSector(): BelongsTo
+{
+    return $this->belongsTo(
+        Sector::class,
+        'destination_sector_id'
+    );
+}
+
+public function legacyDestinationUnit(): BelongsTo
+{
+    return $this->belongsTo(
+        Unit::class,
+        'destination_unit_id'
+    );
+}
 }

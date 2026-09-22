@@ -54,7 +54,20 @@ class StockEntryTest extends TestCase
                 'code' => "B-{$suffix}",
                 'name' => 'Unidade B',
             ]);
+$establishmentId = DB::table('establishments')->insertGetId([
+    'code' => (string) random_int(100000000, 999999999),
+    'name' => 'Estabelecimento de teste',
+    'is_active' => true,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
 
+$sectorId = DB::table('sectors')->insertGetId([
+    'name' => "Setor {$suffix}",
+    'is_active' => true,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
             $this->actingAs($user);
 
             $entries = [
@@ -69,6 +82,9 @@ class StockEntryTest extends TestCase
                     'unit_id' => $unitId,
                     'quantity' => $quantity,
                     'notes' => 'Entrada de teste',
+                    'has_destination' => '1',
+                    'destination_establishment_id' => $establishmentId,
+                    'destination_sector_id' => $sectorId,
                 ])
                     ->assertSessionHasNoErrors()
                     ->assertRedirect(route('stock-entries.create'));
@@ -112,6 +128,15 @@ class StockEntryTest extends TestCase
                 $this->assertSame($user->id, $movement->user_id);
                 $this->assertSame('entry', $movement->type);
                 $this->assertSame('Entrada de teste', $movement->notes);
+                $this->assertSame(
+                    $establishmentId,
+                    $movement->destination_establishment_id
+                );
+
+                $this->assertSame(
+                    $sectorId,
+                    $movement->destination_sector_id
+                );
             }
         } finally {
             DB::rollBack();

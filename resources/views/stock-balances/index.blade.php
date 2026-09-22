@@ -36,7 +36,11 @@
                 @forelse ($balances as $balance)
                     <tr>
                         <td>{{ $balance->item->code }}</td>
-                        <td>{{ $balance->item->name }}</td>
+                        <td>
+                            <a href="{{ route('stock-balances.show', $balance) }}">
+                                {{ $balance->item->name }}
+                            </a>
+                        </td>
                         <td>{{ $balance->unit->name }}</td>
                         <td>{{ $balance->quantity }}</td>
                     </tr>

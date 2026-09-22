@@ -63,7 +63,13 @@ class AssetController extends Controller
     $asset->load(['item', 'unit']);
 
     $movements = $asset->movements()
-        ->with(['user', 'unit'])
+        ->with([
+    'user',
+    'unit',
+    'destinationEstablishment',
+    'destinationSector',
+    'legacyDestinationUnit',
+])
         ->orderByDesc('created_at')
         ->orderByDesc('id')
         ->paginate(15);

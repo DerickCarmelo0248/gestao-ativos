@@ -88,6 +88,8 @@ class RegisterStockEntry
                 'notes' => $data['notes'] ?? null,
                 'created_at' => now(),
                 'updated_at' => now(),
+                'destination_establishment_id' => $data['destination_establishment_id'] ?? null,
+                'destination_sector_id' => $data['destination_sector_id'] ?? null,
             ]);
 
             return $balance;

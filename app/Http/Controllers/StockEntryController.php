@@ -10,6 +10,8 @@ use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use App\Models\Establishment;
+use App\Models\Sector;
 
 class StockEntryController extends Controller
 {
@@ -28,7 +30,22 @@ class StockEntryController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return view('stock-entries.create', compact('items', 'units'));
+        $establishments = Establishment::query()
+            ->where('is_active', true)
+            ->orderByRaw('CAST(code AS INTEGER)')
+            ->get(['id', 'code', 'name']);
+
+        $sectors = Sector::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('stock-entries.create', compact(
+    'items',
+    'units',
+    'establishments',
+    'sectors'
+));
     }
 
     public function store(

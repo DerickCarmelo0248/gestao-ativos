@@ -99,6 +99,75 @@
                     >
                 </p>
 
+<input type="hidden" name="has_destination" value="0">
+
+<p>
+    <label>
+        <input
+            id="has_destination"
+            name="has_destination"
+            type="checkbox"
+            value="1"
+            @checked(old('has_destination') == '1')
+        >
+        Este material já tem destino definido?
+    </label>
+</p>
+
+<fieldset id="destination-fields">
+    <legend>Destino previsto</legend>
+
+    <p>O destino vale para todos os itens desta entrada.</p>
+
+    <p>
+        <label for="destination_establishment_id">
+            Estabelecimento de destino
+        </label><br>
+
+        <select
+            id="destination_establishment_id"
+            name="destination_establishment_id"
+        >
+            <option value="">Selecione</option>
+
+            @foreach ($establishments as $establishment)
+                <option
+                    value="{{ $establishment->id }}"
+                    @selected(
+                        (string) old('destination_establishment_id') ===
+                        (string) $establishment->id
+                    )
+                >
+                    {{ $establishment->code }} - {{ $establishment->name }}
+                </option>
+            @endforeach
+        </select>
+    </p>
+
+    <p>
+        <label for="destination_sector_id">Setor de destino</label><br>
+
+        <select
+            id="destination_sector_id"
+            name="destination_sector_id"
+        >
+            <option value="">Selecione</option>
+
+            @foreach ($sectors as $sector)
+                <option
+                    value="{{ $sector->id }}"
+                    @selected(
+                        (string) old('destination_sector_id') ===
+                        (string) $sector->id
+                    )
+                >
+                    {{ $sector->name }}
+                </option>
+            @endforeach
+        </select>
+    </p>
+</fieldset>
+
                 <p>
                     <label for="notes">Observação (opcional)</label><br>
                     <textarea
@@ -115,14 +184,32 @@
             </form>
 
             <script>
-                document.getElementById('stock-entry-form')
-                    .addEventListener('submit', () => {
-                        const button = document.getElementById('submit-button');
+    const form = document.getElementById('stock-entry-form');
+    const checkbox = document.getElementById('has_destination');
+    const fields = document.getElementById('destination-fields');
+    const destinationUnit = document.getElementById('destination_establishment_id');
+    const destinationSector = document.getElementById('destination_sector_id');
 
-                        button.disabled = true;
-                        button.textContent = 'Registrando…';
-                    });
-            </script>
+    function updateDestinationFields() {
+        const enabled = checkbox.checked;
+
+        fields.hidden = !enabled;
+        fields.disabled = !enabled;
+
+        destinationUnit.required = enabled;
+        destinationSector.required = enabled;
+    }
+
+    checkbox.addEventListener('change', updateDestinationFields);
+    updateDestinationFields();
+
+    form.addEventListener('submit', () => {
+        const button = document.getElementById('submit-button');
+
+        button.disabled = true;
+        button.textContent = 'Registrando…';
+    });
+</script>
         @endif
     </main>
 </body>

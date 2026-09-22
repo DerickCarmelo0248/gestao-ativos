@@ -113,7 +113,74 @@
                     Limite de 500 equipamentos.
                     Os números de série ficarão em branco.
                 </p>
+<input type="hidden" name="has_destination" value="0">
 
+<p>
+    <label>
+        <input
+            id="has_destination"
+            name="has_destination"
+            type="checkbox"
+            value="1"
+            @checked(old('has_destination') == '1')
+        >
+        Estes equipamentos já têm destino definido?
+    </label>
+</p>
+
+<fieldset id="destination-fields">
+    <legend>Destino previsto</legend>
+
+    <p>O destino vale para todos os itens desta entrada.</p>
+
+    <p>
+        <label for="destination_establishment_id">
+            Estabelecimento de destino
+        </label><br>
+
+        <select
+            id="destination_establishment_id"
+            name="destination_establishment_id"
+        >
+            <option value="">Selecione</option>
+
+            @foreach ($establishments as $establishment)
+                <option
+                    value="{{ $establishment->id }}"
+                    @selected(
+                        (string) old('destination_establishment_id') ===
+                        (string) $establishment->id
+                    )
+                >
+                    {{ $establishment->code }} - {{ $establishment->name }}
+                </option>
+            @endforeach
+        </select>
+    </p>
+
+    <p>
+        <label for="destination_sector_id">Setor de destino</label><br>
+
+        <select
+            id="destination_sector_id"
+            name="destination_sector_id"
+        >
+            <option value="">Selecione</option>
+
+            @foreach ($sectors as $sector)
+                <option
+                    value="{{ $sector->id }}"
+                    @selected(
+                        (string) old('destination_sector_id') ===
+                        (string) $sector->id
+                    )
+                >
+                    {{ $sector->name }}
+                </option>
+            @endforeach
+        </select>
+    </p>
+</fieldset>
                 <button type="button" id="preview-button">
                     Conferir intervalo
                 </button>
@@ -159,12 +226,21 @@
                 const error = document.getElementById('preview-error');
                 const confirmation = document.getElementById('confirm-batch');
                 const submit = document.getElementById('submit-button');
-
+                const hasDestination = document.getElementById('has_destination');
+                const destinationFields = document.getElementById('destination-fields');
+                const destinationUnit = document.getElementById('destination_establishment_id');
+                const destinationSector = document.getElementById('destination_sector_id');
                 let reviewedValues = null;
 
                 function currentValues() {
                     return JSON.stringify([
-                        item.value, unit.value, start.value, end.value
+                        item.value,
+                        unit.value,
+                        start.value,
+                        end.value,
+                        hasDestination.checked,
+                        destinationUnit.value,
+                        destinationSector.value
                     ]);
                 }
 
@@ -176,10 +252,26 @@
                     error.textContent = '';
                 }
 
-                for (const field of [item, unit, start, end]) {
-                    field.addEventListener('input', invalidatePreview);
-                    field.addEventListener('change', invalidatePreview);
-                }
+                for (const field of [
+    item, unit, start, end, destinationUnit, destinationSector
+]) {
+    field.addEventListener('input', invalidatePreview);
+    field.addEventListener('change', invalidatePreview);
+}
+
+function updateDestinationFields() {
+    const enabled = hasDestination.checked;
+
+    destinationFields.hidden = !enabled;
+    destinationFields.disabled = !enabled;
+    destinationUnit.required = enabled;
+    destinationSector.required = enabled;
+
+    invalidatePreview();
+}
+
+hasDestination.addEventListener('change', updateDestinationFields);
+updateDestinationFields();
 
                 document.getElementById('preview-button')
                     .addEventListener('click', () => {
@@ -221,10 +313,16 @@
                             );
                         }
 
-                        document.getElementById('preview-summary').textContent =
-                            `${quantity} equipamentos — ` +
-                            `${item.selectedOptions[0].textContent.trim()} — ` +
-                            `${unit.selectedOptions[0].textContent.trim()}`;
+                        const destinationText = hasDestination.checked
+    ? `Destino: ${destinationUnit.selectedOptions[0].textContent.trim()}`
+        + ` / ${destinationSector.selectedOptions[0].textContent.trim()}`
+    : 'Sem destino definido';
+
+document.getElementById('preview-summary').textContent =
+    `${quantity} equipamentos — ` +
+    `${item.selectedOptions[0].textContent.trim()} — ` +
+    `Entrada: ${unit.selectedOptions[0].textContent.trim()} — ` +
+    destinationText;
 
                         document.getElementById('preview-list').value =
                             patrimonies.join('\n');
