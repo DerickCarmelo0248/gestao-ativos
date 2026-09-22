@@ -45,6 +45,30 @@
     </p>
 @endcan
 
+@can('viewAny', \App\Models\Asset::class)
+    <p>
+        <a href="{{ route('assets.index') }}">
+            Consultar equipamentos
+        </a>
+    </p>
+@endcan
+
+@can('recordEntry', \App\Models\StockBalance::class)
+    <p>
+        <a href="{{ route('stock-entries.create') }}">
+            Registrar entrada por quantidade
+        </a>
+    </p>
+@endcan
+
+@can('viewAny', \App\Models\StockBalance::class)
+    <p>
+        <a href="{{ route('stock-balances.index') }}">
+            Consultar estoque por quantidade
+        </a>
+    </p>
+@endcan
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit">Sair</button>

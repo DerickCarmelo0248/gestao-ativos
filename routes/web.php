@@ -6,6 +6,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AssetBatchController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\StockEntryController;
+use App\Http\Controllers\StockBalanceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,4 +55,13 @@ Route::post('/assets/batch', [AssetBatchController::class, 'store'])
     Route::get('/assets/{asset}', [AssetController::class, 'show'])
     ->whereNumber('asset')
     ->name('assets.show');
+
+    Route::get('/stock-entries/create', [StockEntryController::class, 'create'])
+    ->name('stock-entries.create');
+
+Route::post('/stock-entries', [StockEntryController::class, 'store'])
+    ->name('stock-entries.store');
+
+    Route::get('/stock-balances', [StockBalanceController::class, 'index'])
+    ->name('stock-balances.index');
 });
