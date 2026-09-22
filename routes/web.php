@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\AssetBatchController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,4 +33,16 @@ Route::post('/categories', [CategoryController::class, 'store'])
 
         Route::get('/categories', [CategoryController::class, 'index'])
     ->name('categories.index');
+
+    Route::get('/items/create', [ItemController::class, 'create'])
+    ->name('items.create');
+
+Route::post('/items', [ItemController::class, 'store'])
+    ->name('items.store');
+
+    Route::get('/assets/batch/create', [AssetBatchController::class, 'create'])
+    ->name('assets.batch.create');
+
+Route::post('/assets/batch', [AssetBatchController::class, 'store'])
+    ->name('assets.batch.store');
 });

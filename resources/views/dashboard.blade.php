@@ -29,6 +29,22 @@
     </p>
 @endcan
 
+@can('create', \App\Models\Item::class)
+    <p>
+        <a href="{{ route('items.create') }}">
+            Cadastrar item
+        </a>
+    </p>
+@endcan
+
+@can('create', \App\Models\Asset::class)
+    <p>
+        <a href="{{ route('assets.batch.create') }}">
+            Registrar equipamentos por intervalo
+        </a>
+    </p>
+@endcan
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit">Sair</button>
