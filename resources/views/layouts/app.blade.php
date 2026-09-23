@@ -159,6 +159,26 @@
                         Cadastrar categoria
                     </a>
                 @endcan
+
+                @if (auth()->user()->role === 'admin')
+    <p class="nav-heading">Administração</p>
+
+    <a
+        class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}"
+        href="{{ route('users.index') }}"
+    >
+        Usuários
+    </a>
+@endif
+
+<p class="nav-heading">Meu acesso</p>
+
+<a
+    class="nav-link {{ request()->routeIs('account.*') ? 'active' : '' }}"
+    href="{{ route('account.edit') }}"
+>
+    Minha conta
+</a>
             </nav>
 
             <form

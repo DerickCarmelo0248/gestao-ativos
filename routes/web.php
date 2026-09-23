@@ -15,6 +15,8 @@ use App\Http\Controllers\AssetReplacementController;
 use App\Http\Controllers\AssetReturnController;
 use App\Http\Controllers\DisposalContainerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AccountController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -165,4 +167,20 @@ Route::post(
 )
     ->whereNumber('container')
     ->name('disposal-containers.close');
+
+    Route::get('/users', [UserController::class, 'index'])
+    ->name('users.index');
+
+Route::post('/users', [UserController::class, 'store'])
+    ->name('users.store');
+
+    Route::get('/my-account', [AccountController::class, 'edit'])
+    ->name('account.edit');
+
+Route::put(
+    '/my-account/password',
+    [AccountController::class, 'updatePassword']
+)
+    ->middleware('throttle:6,1')
+    ->name('account.password.update');
 });
