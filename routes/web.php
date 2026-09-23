@@ -8,6 +8,8 @@ use App\Http\Controllers\AssetBatchController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\StockEntryController;
 use App\Http\Controllers\StockBalanceController;
+use App\Http\Controllers\StockExitController;
+use App\Http\Controllers\StockReplacementController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -71,4 +73,22 @@ Route::post('/stock-entries', [StockEntryController::class, 'store'])
 )
     ->whereNumber('stockBalance')
     ->name('stock-balances.show');
+
+    Route::get('/stock-exits/create', [StockExitController::class, 'create'])
+    ->name('stock-exits.create');
+
+Route::post('/stock-exits', [StockExitController::class, 'store'])
+    ->name('stock-exits.store');
+
+    Route::get(
+    '/stock-replacements',
+    [StockReplacementController::class, 'index']
+)->name('stock-replacements.index');
+
+Route::post(
+    '/stock-replacements/{replacement}/complete',
+    [StockReplacementController::class, 'complete']
+)
+    ->whereNumber('replacement')
+    ->name('stock-replacements.complete');
 });

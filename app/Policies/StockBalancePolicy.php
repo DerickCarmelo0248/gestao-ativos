@@ -21,4 +21,8 @@ class StockBalancePolicy
     {
         return in_array($user->role, ['admin', 'operator'], true);
     }
+    public function recordExit(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'operator'], true);
+    }
 }

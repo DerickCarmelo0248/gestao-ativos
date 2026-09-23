@@ -35,4 +35,19 @@ class StockMovement extends Model
             'destination_unit_id'
         );
     }
+
+        public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+        public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+        public function technician(): BelongsTo
+    {
+        return $this->belongsTo(Technician::class);
+    }
 }

@@ -43,6 +43,8 @@ class StockBalanceController extends Controller
 
         $movementTypes = [
             'entry' => 'Entrada',
+            'exit' => 'Saída',
+            'replacement' => 'Reposição',
         ];
 
         return view('stock-balances.show', compact(

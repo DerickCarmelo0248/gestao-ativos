@@ -14,60 +14,76 @@
         <p>Você está autenticado no sistema.</p>
 
         @can('create', \App\Models\Category::class)
-    <p>
-        <a href="{{ route('categories.create') }}">
-            Cadastrar categoria
-        </a>
-    </p>
-@endcan
+        <p>
+            <a href="{{ route('categories.create') }}">
+                Cadastrar categoria
+            </a>
+        </p>
+    @endcan
 
-@can('viewAny', \App\Models\Category::class)
-    <p>
-        <a href="{{ route('categories.index') }}">
-            Consultar categorias
-        </a>
-    </p>
-@endcan
+    @can('viewAny', \App\Models\Category::class)
+        <p>
+            <a href="{{ route('categories.index') }}">
+                Consultar categorias
+            </a>
+        </p>
+    @endcan
 
-@can('create', \App\Models\Item::class)
-    <p>
-        <a href="{{ route('items.create') }}">
-            Cadastrar item
-        </a>
-    </p>
-@endcan
+    @can('create', \App\Models\Item::class)
+        <p>
+            <a href="{{ route('items.create') }}">
+                Cadastrar item
+            </a>
+        </p>
+    @endcan
 
-@can('create', \App\Models\Asset::class)
-    <p>
-        <a href="{{ route('assets.batch.create') }}">
-            Registrar equipamentos por intervalo
-        </a>
-    </p>
-@endcan
+    @can('create', \App\Models\Asset::class)
+        <p>
+            <a href="{{ route('assets.batch.create') }}">
+                Registrar equipamentos por intervalo
+            </a>
+        </p>
+    @endcan
 
-@can('viewAny', \App\Models\Asset::class)
-    <p>
-        <a href="{{ route('assets.index') }}">
-            Consultar equipamentos
-        </a>
-    </p>
-@endcan
+    @can('viewAny', \App\Models\Asset::class)
+        <p>
+            <a href="{{ route('assets.index') }}">
+                Consultar equipamentos
+            </a>
+        </p>
+    @endcan
 
-@can('recordEntry', \App\Models\StockBalance::class)
-    <p>
-        <a href="{{ route('stock-entries.create') }}">
-            Registrar entrada por quantidade
-        </a>
-    </p>
-@endcan
+    @can('recordEntry', \App\Models\StockBalance::class)
+        <p>
+            <a href="{{ route('stock-entries.create') }}">
+                Registrar entrada por quantidade
+            </a>
+        </p>
+    @endcan
 
-@can('viewAny', \App\Models\StockBalance::class)
-    <p>
-        <a href="{{ route('stock-balances.index') }}">
-            Consultar estoque por quantidade
-        </a>
-    </p>
-@endcan
+    @can('viewAny', \App\Models\StockBalance::class)
+        <p>
+            <a href="{{ route('stock-balances.index') }}">
+                Consultar estoque por quantidade
+            </a>
+        </p>
+    @endcan
+
+    @can('recordExit', \App\Models\StockBalance::class)
+        <p>
+            <a href="{{ route('stock-exits.create') }}">
+                Registrar saída por quantidade
+            </a>
+        </p>
+    @endcan
+
+    @can('viewAny', \App\Models\StockReplacementRequest::class)
+        <p>
+            <a href="{{ route('stock-replacements.index') }}">
+                Pendências de reposição
+            </a>
+        </p>
+    @endcan
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf

@@ -138,6 +138,104 @@ $sectorId = DB::table('sectors')->insertGetId([
                     $movement->destination_sector_id
                 );
             }
+
+            $technicianId = DB::table('technicians')->insertGetId([
+    'name' => "Técnico {$suffix}",
+    'is_active' => true,
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
+
+// Retira duas unidades e solicita reposição.
+$this->post(route('stock-exits.store'), [
+    'item_id' => $item->id,
+    'unit_id' => $firstUnit->id,
+    'quantity' => 2,
+    'technician_id' => $technicianId,
+    'ticket_number' => 'TEST-001',
+    'destination_establishment_id' => $establishmentId,
+    'destination_sector_id' => $sectorId,
+    'replacement_required' => '1',
+])
+    ->assertSessionHasNoErrors()
+    ->assertRedirect(route('stock-exits.create'));
+
+$this->assertDatabaseHas('stock_balances', [
+    'item_id' => $item->id,
+    'unit_id' => $firstUnit->id,
+    'quantity' => 23,
+]);
+
+$exit = DB::table('stock_movements')
+    ->where('item_id', $item->id)
+    ->where('unit_id', $firstUnit->id)
+    ->where('type', 'exit')
+    ->sole();
+
+$replacement = \App\Models\StockReplacementRequest::query()
+    ->where('stock_movement_id', $exit->id)
+    ->sole();
+
+$this->assertSame(2, $replacement->quantity);
+$this->assertSame('pending', $replacement->status);
+$this->assertSame(
+    $establishmentId,
+    $replacement->destination_establishment_id
+);
+$this->assertSame(
+    $sectorId,
+    $replacement->destination_sector_id
+);
+
+$url = route('stock-replacements.complete', $replacement);
+
+// Confirma o recebimento.
+$this->post($url, ['received' => '1'])
+    ->assertSessionHasNoErrors()
+    ->assertRedirect(route('stock-replacements.index'));
+
+$replacement->refresh();
+
+$this->assertSame('completed', $replacement->status);
+$this->assertSame($user->id, $replacement->completed_by);
+$this->assertNotNull($replacement->completed_at);
+$this->assertNotNull($replacement->replacement_movement_id);
+
+// A mesma pendência não pode ser confirmada novamente.
+$this->post($url, ['received' => '1'])
+    ->assertForbidden();
+
+$this->assertDatabaseHas('stock_balances', [
+    'item_id' => $item->id,
+    'unit_id' => $firstUnit->id,
+    'quantity' => 25,
+]);
+
+// O estoque da outra unidade permanece intacto.
+$this->assertDatabaseHas('stock_balances', [
+    'item_id' => $item->id,
+    'unit_id' => $secondUnit->id,
+    'quantity' => 8,
+]);
+
+$this->assertSame(
+    1,
+    DB::table('stock_movements')
+        ->where('item_id', $item->id)
+        ->where('unit_id', $firstUnit->id)
+        ->where('type', 'replacement')
+        ->count()
+);
+
+$this->assertDatabaseHas('stock_movements', [
+    'id' => $replacement->replacement_movement_id,
+    'item_id' => $item->id,
+    'unit_id' => $firstUnit->id,
+    'user_id' => $user->id,
+    'type' => 'replacement',
+    'quantity' => 2,
+]);
+
         } finally {
             DB::rollBack();
         }
