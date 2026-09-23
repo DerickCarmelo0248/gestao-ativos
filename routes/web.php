@@ -10,6 +10,11 @@ use App\Http\Controllers\StockEntryController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\StockExitController;
 use App\Http\Controllers\StockReplacementController;
+use App\Http\Controllers\AssetExitController;
+use App\Http\Controllers\AssetReplacementController;
+use App\Http\Controllers\AssetReturnController;
+use App\Http\Controllers\DisposalContainerController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,8 +30,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::view('/dashboard', 'dashboard')
-        ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
         Route::get('/categories/create', [CategoryController::class, 'create'])
     ->name('categories.create');
 
@@ -91,4 +96,73 @@ Route::post(
 )
     ->whereNumber('replacement')
     ->name('stock-replacements.complete');
+
+    Route::get('/asset-exits/create', [AssetExitController::class, 'create'])
+    ->name('asset-exits.create');
+
+Route::post('/asset-exits', [AssetExitController::class, 'store'])
+    ->name('asset-exits.store');
+
+    Route::get(
+    '/asset-replacements',
+    [AssetReplacementController::class, 'index']
+)->name('asset-replacements.index');
+
+Route::get(
+    '/asset-replacements/{replacement}/receive',
+    [AssetReplacementController::class, 'edit']
+)
+    ->whereNumber('replacement')
+    ->name('asset-replacements.edit');
+
+Route::post(
+    '/asset-replacements/{replacement}/complete',
+    [AssetReplacementController::class, 'complete']
+)
+    ->whereNumber('replacement')
+    ->name('asset-replacements.complete');
+
+    Route::get('/asset-returns/create', [AssetReturnController::class, 'create'])
+    ->name('asset-returns.create');
+
+Route::post('/asset-returns', [AssetReturnController::class, 'store'])
+    ->name('asset-returns.store');
+
+    Route::get(
+    '/disposal-containers',
+    [DisposalContainerController::class, 'index']
+)->name('disposal-containers.index');
+
+Route::post(
+    '/disposal-containers',
+    [DisposalContainerController::class, 'store']
+)->name('disposal-containers.store');
+
+Route::get(
+    '/disposal-containers/{container}',
+    [DisposalContainerController::class, 'show']
+)
+    ->whereNumber('container')
+    ->name('disposal-containers.show');
+
+Route::post(
+    '/disposal-containers/{container}/assets',
+    [DisposalContainerController::class, 'addAsset']
+)
+    ->whereNumber('container')
+    ->name('disposal-containers.assets.store');
+
+    Route::post(
+    '/disposal-containers/{container}/external-materials',
+    [DisposalContainerController::class, 'addExternal']
+)
+    ->whereNumber('container')
+    ->name('disposal-containers.external.store');
+
+    Route::post(
+    '/disposal-containers/{container}/close',
+    [DisposalContainerController::class, 'close']
+)
+    ->whereNumber('container')
+    ->name('disposal-containers.close');
 });

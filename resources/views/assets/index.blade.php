@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Equipamentos — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Equipamentos')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Equipamentos</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Equipamentos</h1></div>
 
         @can('create', \App\Models\Asset::class)
             <p>
@@ -19,15 +16,7 @@
             </p>
         @endcan
 
-        @if ($errors->any())
-            <div role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        
 
         <form method="GET" action="{{ route('assets.index') }}">
             <p>
@@ -66,7 +55,7 @@
 
         <p>Total encontrado: {{ $assets->total() }}</p>
 
-        <table>
+        <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>
                     <th scope="col">Patrimônio</th>
@@ -99,7 +88,7 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
 
         @if ($assets->hasPages())
             <nav aria-label="Paginação dos equipamentos">
@@ -121,6 +110,7 @@
                 @endif
             </nav>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

@@ -2,18 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\Models\StockBalance;
+use App\Models\Asset;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreStockExitRequest extends FormRequest
+class StoreAssetExitRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can(
-            'recordExit',
-            StockBalance::class
-        ) ?? false;
+        return $this->user()?->can('recordExit', Asset::class) ?? false;
     }
 
     protected function prepareForValidation(): void
@@ -28,27 +25,12 @@ class StoreStockExitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'item_id' => [
+            'asset_id' => [
                 'bail',
                 'required',
                 'integer',
-                Rule::exists('items', 'id')
-                    ->where('tracking_type', 'quantity')
-                    ->where('is_active', true),
-            ],
-            'unit_id' => [
-                'bail',
-                'required',
-                'integer',
-                Rule::exists('units', 'id')
-                    ->where('is_active', true),
-            ],
-            'quantity' => [
-                'bail',
-                'required',
-                'integer',
-                'min:1',
-                'max:10000',
+                Rule::exists('assets', 'id')
+                    ->where('status', 'available'),
             ],
             'technician_id' => [
                 'bail',
@@ -92,12 +74,9 @@ class StoreStockExitRequest extends FormRequest
     {
         return [
             'required' => 'O campo :attribute é obrigatório.',
-            'integer' => 'O campo :attribute deve ser um número inteiro.',
+            'integer' => 'Selecione um valor válido para :attribute.',
             'string' => 'O campo :attribute deve ser um texto.',
-            'item_id.exists' => 'Selecione um item ativo com controle por quantidade.',
-            'unit_id.exists' => 'Selecione uma unidade de estoque ativa.',
-            'quantity.min' => 'A quantidade deve ser pelo menos 1.',
-            'quantity.max' => 'Cada saída pode registrar até 10.000 unidades.',
+            'asset_id.exists' => 'Selecione um equipamento disponível no estoque.',
             'technician_id.exists' => 'Selecione um técnico ativo.',
             'ticket_number.max' => 'O chamado deve ter até 100 caracteres.',
             'destination_establishment_id.exists' => 'Selecione um estabelecimento ativo.',
@@ -110,9 +89,7 @@ class StoreStockExitRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'item_id' => 'item',
-            'unit_id' => 'unidade de origem',
-            'quantity' => 'quantidade',
+            'asset_id' => 'equipamento',
             'technician_id' => 'técnico',
             'ticket_number' => 'número do chamado',
             'destination_establishment_id' => 'estabelecimento de destino',

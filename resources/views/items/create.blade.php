@@ -1,34 +1,21 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Novo item — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Catálogo de itens')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Cadastrar item</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Cadastrar item</h1></div>
 
         <p>
             Este cadastro define o item no catálogo.
             Quantidades e equipamentos serão registrados depois.
         </p>
 
-        @if (session('status'))
-            <p role="status">{{ session('status') }}</p>
-        @endif
+        
 
-        @if ($errors->any())
-            <div role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        
 
         @if ($categories->isEmpty())
             <p>Cadastre uma categoria antes de cadastrar itens.</p>
@@ -122,6 +109,7 @@
                 <button type="submit">Cadastrar item</button>
             </form>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

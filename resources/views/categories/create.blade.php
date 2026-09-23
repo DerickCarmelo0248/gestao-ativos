@@ -1,29 +1,16 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nova categoria — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Categorias')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Cadastrar categoria</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Cadastrar categoria</h1></div>
 
-        @if (session('status'))
-            <p role="status">{{ session('status') }}</p>
-        @endif
+        
 
-        @if ($errors->any())
-            <div role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        
 
         <form method="POST" action="{{ route('categories.store') }}">
             @csrf
@@ -53,6 +40,7 @@
 
             <button type="submit">Cadastrar categoria</button>
         </form>
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

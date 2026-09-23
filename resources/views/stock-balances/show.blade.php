@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Histórico do estoque — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Estoque por quantidade')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('stock-balances.index') }}">
             Voltar ao estoque
         </a>
 
-        <h1>{{ $stockBalance->item->name }}</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>{{ $stockBalance->item->name }}</h1></div>
 
         <dl>
             <dt>Código do item</dt>
@@ -26,7 +23,7 @@
 
         <h2>Histórico de movimentações</h2>
 
-        <table>
+        <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>
                     <th scope="col">Data</th>
@@ -83,7 +80,7 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
 
         @if ($movements->hasPages())
             <nav aria-label="Paginação do histórico">
@@ -105,6 +102,7 @@
                 @endif
             </nav>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

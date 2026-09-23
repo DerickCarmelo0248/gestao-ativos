@@ -1,21 +1,19 @@
 @extends('layouts.app')
-@section('title', 'Reposição por quantidade')
+@section('title', 'Reposição de equipamentos')
 @section('content')
 <div class="module-page">
 
     
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Pendências de reposição</h1></div>
-
-        
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Reposições pendentes de equipamentos</h1></div>
 
         
 
         <p>
-            A reposição retornará ao estoque de origem.
-            O custo será atribuído ao estabelecimento e setor
-            que receberam o material na saída.
+            Cada pendência corresponde a um equipamento.
+            O patrimônio exibido identifica o equipamento que saiu,
+            não o que será comprado.
         </p>
 
         <p>Total de pendências: {{ $replacements->total() }}</p>
@@ -25,15 +23,15 @@
                 <tr>
                     <th scope="col">Data</th>
                     <th scope="col">Saída</th>
+                    <th scope="col">Patrimônio que saiu</th>
                     <th scope="col">Item</th>
-                    <th scope="col">Quantidade a repor</th>
                     <th scope="col">Estoque de origem</th>
                     <th scope="col">Estabelecimento responsável pelo custo</th>
                     <th scope="col">Setor responsável pelo custo</th>
                     <th scope="col">Técnico</th>
                     <th scope="col">Chamado</th>
                     <th scope="col">Situação</th>
-                    <th scope="col">Reposição</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,14 +43,17 @@
                                 ->format('d/m/Y') }}
                         </td>
 
-                        <td>#{{ $replacement->stock_movement_id }}</td>
+                        <td>#{{ $replacement->asset_movement_id }}</td>
 
                         <td>
-                            {{ $replacement->movement->item->code }}
-                            — {{ $replacement->movement->item->name }}
+                            <a href="{{ route('assets.show', $replacement->movement->asset) }}">
+                                {{ $replacement->movement->asset->patrimony }}
+                            </a>
                         </td>
 
-                        <td>{{ $replacement->quantity }}</td>
+                        <td>
+                            {{ $replacement->movement->asset->item->name }}
+                        </td>
 
                         <td>{{ $replacement->movement->unit->name }}</td>
 
@@ -77,36 +78,16 @@
 
                         <td>
                             @can('complete', $replacement)
-                                <form
-                                    method="POST"
-                                    action="{{ route('stock-replacements.complete', $replacement) }}"
-                                    class="replacement-form"
-                                >
-                                    @csrf
-
-                                    <p>
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                name="received"
-                                                value="1"
-                                                required
-                                            >
-                                            Confirmo o recebimento de
-                                            {{ $replacement->quantity }} unidades
-                                            no estoque de {{ $replacement->movement->unit->name }}.
-                                        </label>
-                                    </p>
-
-                                    <button type="submit">Repor</button>
-                                </form>
+                                <a href="{{ route('asset-replacements.edit', $replacement) }}">
+                                    Registrar reposição
+                                </a>
                             @endcan
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="11">
-                            Nenhuma reposição pendente.
+                            Nenhuma reposição de equipamento pendente.
                         </td>
                     </tr>
                 @endforelse
@@ -114,7 +95,7 @@
         </table></div>
 
         @if ($replacements->hasPages())
-            <nav aria-label="Paginação das reposições">
+            <nav aria-label="Paginação das reposições de equipamentos">
                 @if (! $replacements->onFirstPage())
                     <a href="{{ $replacements->previousPageUrl() }}">
                         Anterior
@@ -134,16 +115,6 @@
             </nav>
         @endif
     
-    <script>
-    document.querySelectorAll('.replacement-form').forEach((form) => {
-        form.addEventListener('submit', () => {
-            const button = form.querySelector('button[type="submit"]');
-
-            button.disabled = true;
-            button.textContent = 'Registrando…';
-        });
-    });
-</script>
 
 </div>
 @endsection

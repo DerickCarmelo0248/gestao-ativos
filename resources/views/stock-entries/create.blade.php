@@ -1,34 +1,21 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Entrada de estoque — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Entrada por quantidade')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Entrada de estoque por quantidade</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Entrada de estoque por quantidade</h1></div>
 
         <p>
             Registre a quantidade recebida.
             Ela será somada ao saldo do item na unidade selecionada.
         </p>
 
-        @if (session('status'))
-            <p role="status">{{ session('status') }}</p>
-        @endif
+        
 
-        @if ($errors->any())
-            <div role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        
 
         @if ($items->isEmpty() || $units->isEmpty())
             <p>
@@ -211,6 +198,7 @@
     });
 </script>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

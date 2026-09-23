@@ -45,4 +45,9 @@ public function legacyDestinationUnit(): BelongsTo
         'destination_unit_id'
     );
 }
+
+public function technician(): BelongsTo
+{
+    return $this->belongsTo(Technician::class);
+}
 }

@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Estoque por quantidade — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Estoque por quantidade')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Estoque por quantidade</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Estoque por quantidade</h1></div>
 
         @can('recordEntry', \App\Models\StockBalance::class)
             <p>
@@ -23,7 +20,7 @@
             Cada linha mostra o saldo de um item em uma unidade.
         </p>
 
-        <table>
+        <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>
                     <th scope="col">Código do item</th>
@@ -52,7 +49,7 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
 
         @if ($balances->hasPages())
             <nav aria-label="Paginação do estoque">
@@ -74,6 +71,7 @@
                 @endif
             </nav>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

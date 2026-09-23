@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Equipamento {{ $asset->patrimony }} — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Equipamentos')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('assets.index') }}">
             Voltar aos equipamentos
         </a>
 
-        <h1>Patrimônio {{ $asset->patrimony }}</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Patrimônio {{ $asset->patrimony }}</h1></div>
 
         <dl>
             <dt>Item/modelo</dt>
@@ -20,7 +17,7 @@
             <dt>Número de série</dt>
             <dd>{{ $asset->serial_number ?? 'Não informado' }}</dd>
 
-            <dt>Unidade atual</dt>
+            <dt>Unidade de estoque responsável</dt>
             <dd>{{ $asset->unit->name }}</dd>
 
             <dt>Situação atual</dt>
@@ -29,13 +26,13 @@
 
         <h2>Histórico de movimentações</h2>
 
-        <table>
+        <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>
                     <th scope="col">Data</th>
                     <th scope="col">Operação</th>
                     <th scope="col">Unidade da movimentação</th>
-                    <th scope="col">Destino previsto</th>
+                    <th scope="col">Destino informado na movimentação</th>
                     <th scope="col">Setor de destino</th>
                     <th scope="col">Responsável</th>
                     <th scope="col">Lote</th>
@@ -81,7 +78,7 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
 
         @if ($movements->hasPages())
             <nav aria-label="Paginação do histórico">
@@ -103,6 +100,7 @@
                 @endif
             </nav>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection

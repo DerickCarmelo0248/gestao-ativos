@@ -84,6 +84,11 @@ class AssetController extends Controller
 
     $movementTypes = [
         'entry' => 'Entrada',
+        'exit' => 'Saída',
+        'replacement' => 'Reposição',
+        'return' => 'Devolução',
+        'container_entry' => 'Entrada na caçamba',
+        'disposal' => 'Descarte concluído',
     ];
 
     return view('assets.show', compact(

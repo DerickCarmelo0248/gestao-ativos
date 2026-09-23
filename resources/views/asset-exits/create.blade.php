@@ -1,90 +1,65 @@
 @extends('layouts.app')
-@section('title', 'Saída por quantidade')
+@section('title', 'Saída de equipamentos')
 @section('content')
 <div class="module-page">
 
     
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Registrar saída por quantidade</h1></div>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Registrar saída de equipamento</h1></div>
+
+        <p>
+            Selecione o patrimônio que será retirado.
+            Cada envio registra a saída de um equipamento.
+        </p>
 
         
 
         
 
         @if (
-            $items->isEmpty() ||
-            $units->isEmpty() ||
+            $assets->isEmpty() ||
             $technicians->isEmpty() ||
             $establishments->isEmpty() ||
             $sectors->isEmpty()
         )
             <p>
-                Para registrar a saída, é necessário ter item por
-                quantidade, unidade, técnico, estabelecimento e setor ativos.
+                É necessário ter um equipamento disponível,
+                técnico, estabelecimento e setor ativos.
             </p>
         @else
             <form
-                id="stock-exit-form"
+                id="asset-exit-form"
                 method="POST"
-                action="{{ route('stock-exits.store') }}"
+                action="{{ route('asset-exits.store') }}"
             >
                 @csrf
 
                 <p>
-                    <label for="item_id">Item</label><br>
-                    <select id="item_id" name="item_id" required>
-                        <option value="">Selecione</option>
+                    <label for="asset_id">Equipamento</label><br>
 
-                        @foreach ($items as $item)
+                    <select id="asset_id" name="asset_id" required>
+                        <option value="">Selecione o patrimônio</option>
+
+                        @foreach ($assets as $asset)
                             <option
-                                value="{{ $item->id }}"
+                                value="{{ $asset->id }}"
                                 @selected(
-                                    (string) old('item_id') ===
-                                    (string) $item->id
+                                    (string) old('asset_id') ===
+                                    (string) $asset->id
                                 )
                             >
-                                {{ $item->code }} — {{ $item->name }}
+                                {{ $asset->patrimony }}
+                                — {{ $asset->item->name }}
+                                — Estoque: {{ $asset->unit->name }}
                             </option>
                         @endforeach
                     </select>
-                </p>
-
-                <p>
-                    <label for="unit_id">Unidade de estoque de origem</label><br>
-                    <select id="unit_id" name="unit_id" required>
-                        <option value="">Selecione</option>
-
-                        @foreach ($units as $unit)
-                            <option
-                                value="{{ $unit->id }}"
-                                @selected(
-                                    (string) old('unit_id') ===
-                                    (string) $unit->id
-                                )
-                            >
-                                {{ $unit->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </p>
-
-                <p>
-                    <label for="quantity">Quantidade retirada</label><br>
-                    <input
-                        id="quantity"
-                        name="quantity"
-                        type="number"
-                        min="1"
-                        max="10000"
-                        step="1"
-                        value="{{ old('quantity') }}"
-                        required
-                    >
                 </p>
 
                 <p>
                     <label for="technician_id">Técnico que levou</label><br>
+
                     <select id="technician_id" name="technician_id" required>
                         <option value="">Selecione</option>
 
@@ -180,10 +155,10 @@
                 </p>
 
                 <p>
-                    Ao marcar, será criada uma pendência para repor toda
-                    a quantidade retirada no estoque de origem.
-                    O estabelecimento e o setor de destino serão
-                    os responsáveis pelo custo.
+                    Ao marcar, será criada uma pendência de um equipamento
+                    para o estoque de origem. O estabelecimento e o setor
+                    de destino serão os responsáveis pelo custo.
+                    O equipamento recebido como reposição terá patrimônio próprio.
                 </p>
 
                 <p>
@@ -193,7 +168,7 @@
                         name="notes"
                         rows="4"
                         maxlength="2000"
-                    >{{ old('notes') }} </textarea>
+                    >{{ old('notes') }}</textarea>
                 </p>
 
                 <button id="submit-button" type="submit">
@@ -202,7 +177,7 @@
             </form>
 
             <script>
-                document.getElementById('stock-exit-form')
+                document.getElementById('asset-exit-form')
                     .addEventListener('submit', () => {
                         const button = document.getElementById('submit-button');
 

@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Categorias — Gestão de Ativos</title>
-</head>
-<body>
-    <main>
+@extends('layouts.app')
+@section('title', 'Categorias')
+@section('content')
+<div class="module-page">
+
+    
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
-        <h1>Categorias</h1>
+        <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Categorias</h1></div>
 
         @can('create', \App\Models\Category::class)
             <p>
@@ -21,7 +18,7 @@
 
         <p>Total: {{ $categories->total() }}</p>
 
-        <table>
+        <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>
                     <th scope="col">Nome</th>
@@ -40,7 +37,7 @@
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
 
         @if ($categories->hasPages())
             <nav aria-label="Paginação de categorias">
@@ -62,6 +59,7 @@
                 @endif
             </nav>
         @endif
-    </main>
-</body>
-</html>
+    
+
+</div>
+@endsection
