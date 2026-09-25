@@ -131,6 +131,7 @@
                     </a>
                 @endcan
 
+                @if (auth()->user()->role === 'admin')
                 <p class="nav-heading">Cadastros</p>
 
                 @can('create', \App\Models\Item::class)
@@ -159,6 +160,8 @@
                         Cadastrar categoria
                     </a>
                 @endcan
+
+                @endif
 
                 @if (auth()->user()->role === 'admin')
     <p class="nav-heading">Administração</p>

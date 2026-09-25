@@ -13,6 +13,6 @@ class CategoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'operator'], true);
+        return $user->role === 'admin';
     }
 }
