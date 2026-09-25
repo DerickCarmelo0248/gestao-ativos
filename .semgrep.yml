@@ -1,0 +1,28 @@
+rules:
+  - id: php-no-eval
+    languages: [php]
+    severity: ERROR
+    message: Nao execute codigo dinamico com eval.
+    pattern: eval(...)
+  - id: php-no-unserialize
+    languages: [php]
+    severity: ERROR
+    message: Revise a desserializacao de objetos. Prefira dados JSON validados.
+    pattern: unserialize(...)
+  - id: php-shell-review
+    languages: [php]
+    severity: ERROR
+    message: Execucao de comandos requer revisao de seguranca e argumentos separados.
+    pattern-either:
+      - pattern: shell_exec(...)
+      - pattern: exec(...)
+      - pattern: system(...)
+      - pattern: passthru(...)
+  - id: php-request-mass-assignment
+    languages: [php]
+    severity: ERROR
+    message: Use campos validados e autorizados em vez de request->all().
+    pattern-either:
+      - pattern: $MODEL::create($REQUEST->all())
+      - pattern: $MODEL->update($REQUEST->all())
+      - pattern: $MODEL->fill($REQUEST->all())

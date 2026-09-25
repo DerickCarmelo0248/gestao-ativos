@@ -1,0 +1,8 @@
+# Revisao especialmente importante para autenticacao, banco e pipeline.
+/.github/ @DerickCarmelo0248
+/.semgrep.yml @DerickCarmelo0248
+/scripts/ci/ @DerickCarmelo0248
+/app/Http/Controllers/AccountController.php @DerickCarmelo0248
+/app/Http/Controllers/UserController.php @DerickCarmelo0248
+/app/Policies/ @DerickCarmelo0248
+/database/migrations/ @DerickCarmelo0248
