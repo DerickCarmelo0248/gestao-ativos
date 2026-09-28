@@ -91,7 +91,7 @@ class DisposalContainerController extends Controller
         ->paginate(20);
 
     $assets = Asset::query()
-        ->where('status', 'awaiting_disposal')
+        ->whereIn('status', ['available', 'awaiting_disposal'])
         ->whereHas('item', function ($query) {
             $query->where('tracking_type', 'individual');
         })
@@ -137,7 +137,7 @@ public function addAsset(
             'required',
             'integer',
             Rule::exists('assets', 'id')
-                ->where('status', 'awaiting_disposal'),
+                ->whereIn('status', ['available', 'awaiting_disposal']),
         ],
         'reason' => [
             'required',
@@ -148,7 +148,7 @@ public function addAsset(
         'asset_id.required' => 'Selecione o equipamento.',
         'asset_id.integer' => 'Selecione um equipamento válido.',
         'asset_id.exists' =>
-            'Selecione um equipamento aguardando descarte.',
+            'Selecione um equipamento disponível ou aguardando descarte.',
         'reason.required' => 'Informe o motivo do descarte.',
         'reason.string' => 'O motivo deve ser um texto.',
         'reason.max' => 'O motivo deve ter até 2.000 caracteres.',

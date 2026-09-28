@@ -33,6 +33,7 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'minimum_stock' => ['sometimes', 'required', 'integer', 'min:0', 'max:2147483647'],
             'category_id' => [
                 'bail',
                 'required',
@@ -67,6 +68,9 @@ class StoreItemRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'minimum_stock.integer' => 'O estoque mínimo deve ser um número inteiro.',
+            'minimum_stock.min' => 'O estoque mínimo não pode ser negativo.',
+            'minimum_stock.max' => 'O estoque mínimo deve ser no máximo 2147483647.',
             'required' => 'O campo :attribute é obrigatório.',
             'string' => 'O campo :attribute deve ser um texto.',
             'max' => 'O campo :attribute deve ter até :max caracteres.',
@@ -86,6 +90,7 @@ class StoreItemRequest extends FormRequest
             'name' => 'nome',
             'description' => 'descrição',
             'tracking_type' => 'tipo de controle',
+            'minimum_stock' => 'estoque mínimo',
         ];
     }
 }

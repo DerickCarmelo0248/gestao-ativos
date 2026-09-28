@@ -13,12 +13,14 @@ class Item extends Model
         'name',
         'description',
         'tracking_type',
+        'minimum_stock',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'minimum_stock' => 'integer',
         ];
     }
 

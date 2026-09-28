@@ -49,10 +49,10 @@ class AddAssetToDisposalContainer
                 ->lockForUpdate()
                 ->find($data['asset_id']);
 
-            if (! $asset || $asset->status !== 'awaiting_disposal') {
+            if (! $asset || ! in_array($asset->status, ['available', 'awaiting_disposal'], true)) {
                 throw ValidationException::withMessages([
                     'asset_id' =>
-                        'Selecione um equipamento aguardando descarte.',
+                        'Selecione um equipamento disponível ou aguardando descarte.',
                 ]);
             }
 

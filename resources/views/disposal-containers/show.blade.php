@@ -28,12 +28,12 @@
             <h2>Adicionar equipamento com patrimônio</h2>
 
             <p>
-                Selecione um equipamento aguardando descarte.
+                Selecione um equipamento disponível ou aguardando descarte.
                 A unidade de origem será preservada no registro.
             </p>
 
             @if ($assets->isEmpty())
-                <p>Nenhum equipamento aguardando descarte.</p>
+                <p>Nenhum equipamento disponível ou aguardando descarte. Equipamentos em uso precisam ser devolvidos primeiro.</p>
             @else
                 <form
                     id="add-asset-form"
@@ -55,7 +55,7 @@
                                 >
                                     {{ $asset->patrimony }}
                                     — {{ $asset->item->name }}
-                                    — Origem: {{ $asset->unit->name }}
+                                    — Origem: {{ $asset->unit->name }} — {{ $asset->status === 'available' ? 'Disponível' : 'Aguardando descarte' }}
                                 </option>
                             @endforeach
                         </select>
