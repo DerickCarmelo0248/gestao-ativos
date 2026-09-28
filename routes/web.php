@@ -32,6 +32,14 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+    Route::get('/items/{item}/edit', [ItemController::class, 'edit'])->whereNumber('item')->name('items.edit');
+    Route::put('/items/{item}', [ItemController::class, 'update'])->whereNumber('item')->name('items.update');
+    Route::delete('/items/{item}', [ItemController::class, 'destroy'])->whereNumber('item')->name('items.destroy');
+    Route::get('/assets/{asset}/edit', [AssetController::class, 'edit'])
+        ->whereNumber('asset')->name('assets.edit');
+    Route::put('/assets/{asset}', [AssetController::class, 'update'])
+        ->whereNumber('asset')->name('assets.update');
     Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
         ->whereNumber('category')->name('categories.edit');
     Route::put('/categories/{category}', [CategoryController::class, 'update'])

@@ -133,10 +133,11 @@
 
                 @if (auth()->user()->role === 'admin')
                 <p class="nav-heading">Cadastros</p>
+                @can('manage', \App\Models\Item::class)<a class="nav-link {{ request()->routeIs('items.index', 'items.edit') ? 'active' : '' }}" href="{{ route('items.index') }}">Consultar itens</a>@endcan
 
                 @can('create', \App\Models\Item::class)
                     <a
-                        class="nav-link {{ request()->routeIs('items.*') ? 'active' : '' }}"
+                        class="nav-link {{ request()->routeIs('items.create') ? 'active' : '' }}"
                         href="{{ route('items.create') }}"
                     >
                         Cadastrar item
