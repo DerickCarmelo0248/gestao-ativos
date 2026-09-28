@@ -82,12 +82,12 @@ public function test_admin_can_view_categories(): void
     );
 }
 
-public function test_operator_can_view_categories(): void
+public function test_operator_cannot_view_categories(): void
 {
     $user = new User();
     $user->role = 'operator';
 
-    $this->assertTrue(
+    $this->assertFalse(
         $user->can('viewAny', \App\Models\Category::class)
     );
 }

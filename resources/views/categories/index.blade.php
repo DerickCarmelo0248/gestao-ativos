@@ -23,6 +23,7 @@
                 <tr>
                     <th scope="col">Nome</th>
                     <th scope="col">Descrição</th>
+                    <th scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,10 +31,24 @@
                     <tr>
                         <td>{{ $category->name }}</td>
                         <td>{{ $category->description ?? '—' }}</td>
+                        <td>
+                            <div class="category-actions">
+                                @can('update', $category)
+                                    <a href="{{ route('categories.edit', $category) }}" aria-label="Editar categoria {{ $category->name }}">Editar</a>
+                                @endcan
+                                @can('delete', $category)
+                                    <form method="POST" action="{{ route('categories.destroy', $category) }}" class="category-delete-form" data-category-name="{{ $category->name }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" aria-label="Excluir categoria {{ $category->name }}">Excluir</button>
+                                    </form>
+                                @endcan
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="2">Nenhuma categoria cadastrada.</td>
+                        <td colspan="3">Nenhuma categoria cadastrada.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -63,3 +78,15 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.category-delete-form').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            if (!window.confirm(`Excluir a categoria "${form.dataset.categoryName}"? Esta ação não pode ser desfeita.`)) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+@endpush

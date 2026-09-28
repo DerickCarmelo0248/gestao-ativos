@@ -50,6 +50,41 @@ class UserSecurityTest extends TestCase
         $this->put(route('account.password.update'), [])->assertRedirect(route('login'));
     }
 
+    public function test_operator_cannot_access_catalog_management_or_see_its_menu(): void
+    {
+        $this->actingAs($this->user());
+
+        foreach (['categories.index', 'categories.create', 'items.create'] as $route) {
+            $this->get(route($route))->assertForbidden();
+        }
+
+        foreach (['categories.store', 'items.store'] as $route) {
+            $this->post(route($route), [])->assertForbidden();
+        }
+
+        $this->get(route('account.edit'))->assertOk()
+            ->assertDontSee('Cadastros')
+            ->assertDontSee('href="'.route('categories.index').'"', false)
+            ->assertDontSee('href="'.route('categories.create').'"', false)
+            ->assertDontSee('href="'.route('items.create').'"', false)
+            ->assertSee('Minha conta');
+    }
+
+    public function test_admin_retains_catalog_pages_and_menu(): void
+    {
+        $this->actingAs($this->user('admin'));
+
+        foreach (['categories.index', 'categories.create', 'items.create'] as $route) {
+            $this->get(route($route))->assertOk();
+        }
+
+        $this->get(route('account.edit'))->assertOk()
+            ->assertSee('Cadastros')
+            ->assertSee('href="'.route('categories.index').'"', false)
+            ->assertSee('href="'.route('categories.create').'"', false)
+            ->assertSee('href="'.route('items.create').'"', false);
+    }
+
     public function test_operator_cannot_create_admin_even_by_direct_request(): void
     {
         $user = $this->user();
