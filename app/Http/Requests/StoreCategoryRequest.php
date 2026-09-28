@@ -37,6 +37,9 @@ class StoreCategoryRequest extends FormRequest
                         'LOWER(TRIM(name)) = LOWER(TRIM(CAST(? AS TEXT)))',
                         [$value]
                     )
+                    ->when($this instanceof UpdateCategoryRequest, function ($query) {
+                        $query->where('id', '<>', $this->route('category')->getKey());
+                    })
                     ->exists();
 
                 if ($exists) {

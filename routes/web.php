@@ -32,6 +32,12 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
+        ->whereNumber('category')->name('categories.edit');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])
+        ->whereNumber('category')->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
+        ->whereNumber('category')->name('categories.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
         Route::get('/categories/create', [CategoryController::class, 'create'])
