@@ -10,6 +10,9 @@
 
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Patrimônio {{ $asset->patrimony }}</h1></div>
 
+        @can('update', $asset)
+            <p><a class="button" href="{{ route('assets.edit', $asset) }}">Editar equipamento</a></p>
+        @endcan
         <dl>
             <dt>Item/modelo</dt>
             <dd>{{ $asset->item->name }}</dd>
@@ -22,7 +25,30 @@
 
             <dt>Situação atual</dt>
             <dd>{{ $statuses[$asset->status] ?? $asset->status }}</dd>
+            <dt>Observações do equipamento</dt>
+            <dd>{{ $asset->notes ?? 'Não informado' }}</dd>
         </dl>
+
+        @if ($edits->isNotEmpty())
+            <h2>Histórico de alterações cadastrais</h2>
+            <div class="table-wrapper"><table>
+                <thead><tr><th>Data</th><th>Responsável</th><th>Campo</th><th>Antes</th><th>Depois</th></tr></thead>
+                <tbody>
+                @foreach ($edits as $edit)
+                    @php
+                        $before = json_decode($edit->before, true);
+                        $after = json_decode($edit->after, true);
+                    @endphp
+                    @foreach (['patrimony' => 'Patrimônio', 'serial_number' => 'Número de série', 'notes' => 'Observações'] as $field => $label)
+                        @if (($before[$field] ?? null) !== ($after[$field] ?? null))
+                            <tr><td>{{ \Illuminate\Support\Carbon::parse($edit->created_at)->timezone('America/Sao_Paulo')->format('d/m/Y H:i') }}</td><td>{{ $edit->user_name }}</td><td>{{ $label }}</td><td>{{ $before[$field] ?? 'Não informado' }}</td><td>{{ $after[$field] ?? 'Não informado' }}</td></tr>
+                        @endif
+                    @endforeach
+                @endforeach
+                </tbody>
+            </table></div>
+            {{ $edits->withQueryString()->links() }}
+        @endif
 
         <h2>Histórico de movimentações</h2>
 
