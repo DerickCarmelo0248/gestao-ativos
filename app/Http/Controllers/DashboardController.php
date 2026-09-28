@@ -24,9 +24,10 @@ class DashboardController extends Controller
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:150'],
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
+            'stock_report' => ['nullable', 'in:minimum,zero'],
         ]);
 
-        $lowStockQuery = LowStock::query();
+        $lowStockQuery = LowStock::query(($filters['stock_report'] ?? 'minimum') === 'zero');
 
         $monthStart = Carbon::now('America/Sao_Paulo')->startOfMonth()->utc();
         $nextMonth = $monthStart->copy()->timezone('America/Sao_Paulo')
@@ -34,7 +35,7 @@ class DashboardController extends Controller
 
         $stats = [
             'available' => Asset::where('status', 'available')->count(),
-            'low' => (clone $lowStockQuery)->count(),
+            'low' => LowStock::query()->count(),
             'pending' => DB::table('asset_replacement_requests')
                 ->whereIn('status', ['pending', 'purchasing'])->count()
                 + DB::table('stock_replacement_requests')

@@ -70,7 +70,7 @@ class AssetExitController extends Controller
         }
 
         return redirect()
-            ->route('asset-exits.create')
+            ->route($request->boolean('unified') ? 'movements.exit' : 'asset-exits.create', $request->boolean('unified') ? ['item_id' => $asset->item_id] : [])
             ->with('status', $message);
     }
 }

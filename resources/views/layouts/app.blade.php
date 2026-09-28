@@ -58,41 +58,11 @@
                 <p class="nav-heading">Movimentações</p>
 
                 @can('create', \App\Models\Asset::class)
-                    <a
-                        class="nav-link {{ request()->routeIs('assets.batch.*') ? 'active' : '' }}"
-                        href="{{ route('assets.batch.create') }}"
-                    >
-                        Entrada de equipamentos
-                    </a>
+                    <a class="nav-link {{ request()->routeIs('movements.entry', 'assets.batch.*', 'stock-entries.*') ? 'active' : '' }}" href="{{ route('movements.entry') }}">Entrada</a>
                 @endcan
-
-                @can('recordEntry', \App\Models\StockBalance::class)
-                    <a
-                        class="nav-link {{ request()->routeIs('stock-entries.*') ? 'active' : '' }}"
-                        href="{{ route('stock-entries.create') }}"
-                    >
-                        Entrada por quantidade
-                    </a>
-                @endcan
-
                 @can('recordExit', \App\Models\Asset::class)
-                    <a
-                        class="nav-link {{ request()->routeIs('asset-exits.*') ? 'active' : '' }}"
-                        href="{{ route('asset-exits.create') }}"
-                    >
-                        Saída de equipamentos
-                    </a>
+                    <a class="nav-link {{ request()->routeIs('movements.exit', 'asset-exits.*', 'stock-exits.*') ? 'active' : '' }}" href="{{ route('movements.exit') }}">Saída</a>
                 @endcan
-
-                @can('recordExit', \App\Models\StockBalance::class)
-                    <a
-                        class="nav-link {{ request()->routeIs('stock-exits.*') ? 'active' : '' }}"
-                        href="{{ route('stock-exits.create') }}"
-                    >
-                        Saída por quantidade
-                    </a>
-                @endcan
-
                 @can('recordReturn', \App\Models\Asset::class)
                     <a
                         class="nav-link {{ request()->routeIs('asset-returns.*') ? 'active' : '' }}"

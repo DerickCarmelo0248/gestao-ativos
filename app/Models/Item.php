@@ -14,6 +14,7 @@ class Item extends Model
         'description',
         'tracking_type',
         'minimum_stock',
+        'minimum_stock_enabled',
     ];
 
     protected function casts(): array
@@ -21,6 +22,7 @@ class Item extends Model
         return [
             'is_active' => 'boolean',
             'minimum_stock' => 'integer',
+            'minimum_stock_enabled' => 'boolean',
         ];
     }
 

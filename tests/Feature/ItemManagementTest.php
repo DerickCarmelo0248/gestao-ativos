@@ -105,4 +105,32 @@ class ItemManagementTest extends TestCase
         $this->get(route('dashboard'))->assertOk()->assertDontSee('Consultar itens');
         $this->assertDatabaseHas('items', ['id' => $item->id]);
     }
-}
+    public function test_optional_minimum_can_be_disabled_and_zero_balance_remains_visible(): void
+    {
+        $this->signIn('admin');
+        $item = $this->item();
+        $data = ['category_id' => $item->category_id, 'code' => $item->code,
+            'name' => $item->name, 'tracking_type' => 'quantity', 'minimum_stock' => 5,
+            'minimum_stock_enabled' => '0'];
+        $this->put(route('items.update', $item), $data)->assertSessionHasNoErrors();
+        $this->assertFalse($item->fresh()->minimum_stock_enabled);
+        $unit = \App\Models\Unit::create(['code' => bin2hex(random_bytes(3)), 'name' => 'Unidade teste']);
+        DB::table('stock_balances')->insert(['item_id' => $item->id, 'unit_id' => $unit->id, 'quantity' => 2]);
+        $query = fn (bool $zero) => \App\Queries\LowStock::query($zero)->where('item_id', $item->id)->where('unit_id', $unit->id);
+        $this->assertFalse($query(false)->exists());
+        $this->assertFalse($query(true)->exists());
+        DB::table('stock_balances')->where('item_id', $item->id)->update(['quantity' => 0]);
+        $this->assertFalse($query(false)->exists());
+        $this->assertTrue($query(true)->exists());
+        $this->get(route('dashboard', ['stock_report' => 'zero', 'search' => $item->code]))
+            ->assertOk()->assertSee('Relatório de saldo zerado')->assertSee('Desativado');
+        $this->put(route('items.update', $item), array_replace($data, ['minimum_stock_enabled' => '1']))->assertSessionHasNoErrors();
+        $this->assertTrue($item->fresh()->minimum_stock_enabled);
+        $this->assertTrue($query(false)->exists());
+        $this->assertTrue($query(true)->exists());
+        $data['code'] .= '-NEW';
+        $this->post(route('items.store'), $data)->assertSessionHasNoErrors();
+        $this->assertFalse(Item::where('code', $data['code'])->firstOrFail()->minimum_stock_enabled);
+        $this->postJson(route('items.store'), array_replace($data, ['code' => $data['code'].'-BAD', 'minimum_stock_enabled' => 'invalid']))
+            ->assertUnprocessable()->assertJsonValidationErrors('minimum_stock_enabled');
+    }}

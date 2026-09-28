@@ -6,7 +6,11 @@
     
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
+        @isset($movement)
+            @include('movements.selector')
+        @else
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Registrar saída por quantidade</h1></div>
+        @endisset
 
         
 
@@ -30,6 +34,7 @@
                 action="{{ route('stock-exits.store') }}"
             >
                 @csrf
+                @isset($movement)<input type="hidden" name="unified" value="1">@endisset
 
                 <p>
                     <label for="item_id">Item</label><br>
@@ -40,7 +45,7 @@
                             <option
                                 value="{{ $item->id }}"
                                 @selected(
-                                    (string) old('item_id') ===
+                                    (string) old('item_id', $selectedItem->id ?? null) ===
                                     (string) $item->id
                                 )
                             >

@@ -89,9 +89,14 @@
 
 
                 <p>
+                    <label for="minimum_stock_enabled">Controlar estoque mínimo?</label><br>
+                    <select id="minimum_stock_enabled" name="minimum_stock_enabled">
+                        <option value="1" @selected(old('minimum_stock_enabled', $item->minimum_stock_enabled) == 1)>Sim</option>
+                        <option value="0" @selected(old('minimum_stock_enabled', $item->minimum_stock_enabled) == 0)>Não — avisar somente quando zerar</option>
+                    </select><br>
                     <label for="minimum_stock">Estoque mínimo por unidade</label><br>
                     <input id="minimum_stock" name="minimum_stock" type="number" min="0" max="2147483647" step="1" value="{{ old('minimum_stock', $item->minimum_stock) }}" required>
-                    <small>O painel avisa quando o saldo disponível de cada unidade for igual ou inferior ao mínimo. Para equipamentos, são contados apenas os disponíveis. Zero mantém o aviso de falta de estoque.</small>
+                    <small>O painel avisa quando o saldo disponível de cada unidade for igual ou inferior ao mínimo. Para equipamentos, são contados apenas os disponíveis. Com o controle desativado, o mínimo é ignorado e o item aparece apenas na consulta de saldos zerados quando não houver saldo disponível.</small>
                 </p>
                 <button type="submit">Salvar alterações</button>
             </form>

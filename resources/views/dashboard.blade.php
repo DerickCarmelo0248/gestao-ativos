@@ -31,19 +31,19 @@
 
     <div class="dashboard-columns">
         <section class="panel inventory-panel">
-            <div class="panel-heading"><div><p class="eyebrow">ATENÇÃO AO ESTOQUE</p><h2>Itens que precisam de reposição</h2></div><span class="badge red">{{ $stats['low'] }} registros</span></div>
-            <p class="panel-description">Saldo disponível igual ou inferior ao mínimo por unidade. Equipamentos em uso ou separados para descarte não contam como disponíveis.</p>
+            <div class="panel-heading"><div><p class="eyebrow">ATENÇÃO AO ESTOQUE</p><h2>{{ ($filters['stock_report'] ?? 'minimum') === 'zero' ? 'Relatório de saldo zerado' : 'Itens no estoque mínimo' }}</h2></div><span class="badge red">{{ $lowBalances->total() }} registros</span></div>
+            <p class="panel-description">Estoque mínimo: somente itens com o controle ativado. Saldo zerado: todos os itens com saldo disponível igual a zero, inclusive os que não controlam mínimo. Equipamentos em uso ou separados para descarte não contam como disponíveis.</p>
             <form class="filter-bar" action="{{ route('dashboard') }}" method="GET">
                 <label class="search-field"><span class="sr-only">Buscar nome ou código</span><svg aria-hidden="true"><use href="#icon-search"/></svg><input name="search" maxlength="150" placeholder="Buscar nome ou código…" value="{{ $filters['search'] ?? '' }}"></label>
                 <label><span class="sr-only">Unidade</span><select name="unit_id"><option value="">Todas as unidades</option>@foreach ($units as $unit)<option value="{{ $unit->id }}" @selected(($filters['unit_id'] ?? '') == $unit->id)>{{ $unit->name }}</option>@endforeach</select></label>
-                <button class="button button-secondary" type="submit">Filtrar</button>
+                <label>Consulta<select name="stock_report"><option value="minimum" @selected(($filters['stock_report'] ?? 'minimum') === 'minimum')>Estoque mínimo</option><option value="zero" @selected(($filters['stock_report'] ?? '') === 'zero')>Saldo zerado</option></select></label><button class="button button-secondary" type="submit">Filtrar</button>
                 @if (!empty($filters['search']) || !empty($filters['unit_id']))<a class="reset-filter" href="{{ route('dashboard') }}">Limpar</a>@endif
             </form>
             <div class="table-wrapper"><table class="dashboard-table"><thead><tr><th>Item / modelo</th><th>Unidade</th><th>Disponível</th><th>Mínimo</th><th>Situação</th></tr></thead><tbody>
                 @forelse ($lowBalances as $balance)
-                    <tr><td><a class="item-title" href="{{ ($balance->tracking_type === 'individual' ? route('assets.index', ['unit_id' => $balance->unit_id]) : ($balance->balance_id ? route('stock-balances.show', $balance->balance_id) : route('stock-balances.index'))) }}">{{ $balance->name }}</a><small>{{ $balance->code }}</small></td><td>{{ $balance->unit_name }}</td><td class="quantity-zero">{{ $balance->quantity }}</td><td>{{ $balance->minimum_stock }}</td><td><span class="badge red">{{ $balance->quantity == 0 ? 'Sem saldo' : 'Repor estoque' }}</span></td></tr>
+                    <tr><td><a class="item-title" href="{{ ($balance->tracking_type === 'individual' ? route('assets.index', ['unit_id' => $balance->unit_id]) : ($balance->balance_id ? route('stock-balances.show', $balance->balance_id) : route('stock-balances.index'))) }}">{{ $balance->name }}</a><small>{{ $balance->code }}</small></td><td>{{ $balance->unit_name }}</td><td class="quantity-zero">{{ $balance->quantity }}</td><td>{{ $balance->minimum_stock_enabled ? $balance->minimum_stock : 'Desativado' }}</td><td><span class="badge red">{{ $balance->quantity == 0 ? 'Sem saldo' : 'Repor estoque' }}</span></td></tr>
                 @empty
-                    <tr><td colspan="5"><div class="empty-state"><span class="icon-tile green"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><strong>Nenhum item no mínimo encontrado</strong><p>Não há registros correspondentes a esta consulta.</p></div></td></tr>
+                    <tr><td colspan="5"><div class="empty-state"><span class="icon-tile green"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><strong>Nenhum item encontrado nesta consulta</strong><p>Não há registros correspondentes a esta consulta.</p></div></td></tr>
                 @endforelse
             </tbody></table></div>
             <div class="panel-footer"><span>{{ $lowBalances->total() }} registro(s) nesta consulta</span><div class="pagination">@if (!$lowBalances->onFirstPage())<a href="{{ $lowBalances->previousPageUrl() }}" aria-label="Página anterior">←</a>@endif<span>{{ $lowBalances->currentPage() }} / {{ $lowBalances->lastPage() }}</span>@if ($lowBalances->hasMorePages())<a href="{{ $lowBalances->nextPageUrl() }}" aria-label="Próxima página">→</a>@endif</div></div>

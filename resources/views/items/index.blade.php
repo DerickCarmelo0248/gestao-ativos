@@ -15,7 +15,7 @@
         <thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Controle</th><th>Mínimo por unidade</th><th>Situação</th><th>Ações</th></tr></thead>
         <tbody>
         @forelse ($items as $item)
-            <tr><td>{{ $item->code }}</td><td>{{ $item->name }}</td><td>{{ $item->category->name }}</td><td>{{ $item->tracking_type === 'individual' ? 'Individual' : 'Quantidade' }}</td><td>{{ $item->minimum_stock }}</td><td>{{ $item->is_active ? 'Ativo' : 'Inativo' }}</td>
+            <tr><td>{{ $item->code }}</td><td>{{ $item->name }}</td><td>{{ $item->category->name }}</td><td>{{ $item->tracking_type === 'individual' ? 'Individual' : 'Quantidade' }}</td><td>{{ $item->minimum_stock_enabled ? $item->minimum_stock : 'Desativado' }}</td><td>{{ $item->is_active ? 'Ativo' : 'Inativo' }}</td>
                 <td><a href="{{ route('items.edit', $item) }}">Editar</a>
                     <form method="POST" action="{{ route('items.destroy', $item) }}" data-delete-item>
                         @csrf @method('DELETE')

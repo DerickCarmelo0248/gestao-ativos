@@ -33,6 +33,7 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'minimum_stock_enabled' => ['sometimes', 'required', 'boolean'],
             'minimum_stock' => ['sometimes', 'required', 'integer', 'min:0', 'max:2147483647'],
             'category_id' => [
                 'bail',

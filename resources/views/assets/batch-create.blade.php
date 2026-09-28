@@ -6,7 +6,11 @@
     
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
+        @isset($movement)
+            @include('movements.selector')
+        @else
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Entrada de equipamentos por intervalo</h1></div>
+        @endisset
 
         <p>
             Todos os equipamentos terão o mesmo item e unidade.
@@ -29,6 +33,7 @@
                 action="{{ route('assets.batch.store') }}"
             >
                 @csrf
+                @isset($movement)<input type="hidden" name="unified" value="1">@endisset
 
                 <p>
                     <label for="item_id">Item/modelo</label><br>
@@ -39,7 +44,7 @@
                             <option
                                 value="{{ $item->id }}"
                                 @selected(
-                                    (string) old('item_id') ===
+                                    (string) old('item_id', $selectedItem->id ?? null) ===
                                     (string) $item->id
                                 )
                             >

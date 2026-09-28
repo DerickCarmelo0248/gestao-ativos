@@ -32,6 +32,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/movements/entry', [\App\Http\Controllers\MovementController::class, 'entry'])->name('movements.entry');
+    Route::get('/movements/exit', [\App\Http\Controllers\MovementController::class, 'exit'])->name('movements.exit');
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
     Route::get('/items/{item}/edit', [ItemController::class, 'edit'])->whereNumber('item')->name('items.edit');
     Route::put('/items/{item}', [ItemController::class, 'update'])->whereNumber('item')->name('items.update');
