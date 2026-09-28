@@ -106,6 +106,12 @@
                     </select>
                 </p>
 
+
+                <p>
+                    <label for="minimum_stock">Estoque mínimo por unidade</label><br>
+                    <input id="minimum_stock" name="minimum_stock" type="number" min="0" max="2147483647" step="1" value="{{ old('minimum_stock', 0) }}" required>
+                    <small>O painel avisa quando o saldo disponível de cada unidade for igual ou inferior ao mínimo. Para equipamentos, são contados apenas os disponíveis. Zero mantém o aviso de falta de estoque.</small>
+                </p>
                 <button type="submit">Cadastrar item</button>
             </form>
         @endif

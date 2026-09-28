@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\DisposalContainer;
 use App\Models\StockBalance;
 use App\Models\Unit;
+use App\Queries\LowStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -25,10 +26,7 @@ class DashboardController extends Controller
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
         ]);
 
-        $zeroQuery = StockBalance::query()
-            ->where('quantity', 0)
-            ->whereHas('item', fn ($q) => $q->where('is_active', true))
-            ->whereHas('unit', fn ($q) => $q->where('is_active', true));
+        $lowStockQuery = LowStock::query();
 
         $monthStart = Carbon::now('America/Sao_Paulo')->startOfMonth()->utc();
         $nextMonth = $monthStart->copy()->timezone('America/Sao_Paulo')
@@ -36,7 +34,7 @@ class DashboardController extends Controller
 
         $stats = [
             'available' => Asset::where('status', 'available')->count(),
-            'zero' => (clone $zeroQuery)->count(),
+            'low' => (clone $lowStockQuery)->count(),
             'pending' => DB::table('asset_replacement_requests')
                 ->whereIn('status', ['pending', 'purchasing'])->count()
                 + DB::table('stock_replacement_requests')
@@ -52,21 +50,19 @@ class DashboardController extends Controller
         ];
 
         if (! empty($filters['unit_id'])) {
-            $zeroQuery->where('unit_id', $filters['unit_id']);
+            $lowStockQuery->where('unit_id', $filters['unit_id']);
         }
 
         $search = trim($filters['search'] ?? '');
         if ($search !== '') {
-            $zeroQuery->whereHas('item', function ($q) use ($search) {
-                $q->where(function ($q) use ($search) {
-                    $q->where('name', 'ilike', '%'.$search.'%')
-                        ->orWhere('code', 'ilike', '%'.$search.'%');
-                });
+            $lowStockQuery->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', '%'.$search.'%')
+                    ->orWhere('code', 'ilike', '%'.$search.'%');
             });
         }
 
-        $zeroBalances = $zeroQuery->with(['item', 'unit'])
-            ->orderBy('id')->paginate(6)->withQueryString();
+        $lowBalances = $lowStockQuery->orderBy('name')->orderBy('item_id')->orderBy('unit_id')
+            ->paginate(6)->withQueryString();
         $units = Unit::orderBy('name')->get(['id', 'name']);
 
         $containers = DisposalContainer::with('unit')
@@ -115,7 +111,7 @@ class DashboardController extends Controller
             'disposal' => 'Descarte',
         ];
 
-        return view('dashboard', compact('stats', 'filters', 'zeroBalances',
+        return view('dashboard', compact('stats', 'filters', 'lowBalances',
             'units', 'containers', 'lastClosed', 'events', 'eventLabels'));
     }
 }
