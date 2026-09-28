@@ -6,7 +6,11 @@
     
         <a href="{{ route('dashboard') }}">Voltar ao painel</a>
 
+        @isset($movement)
+            @include('movements.selector')
+        @else
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Registrar saída de equipamento</h1></div>
+        @endisset
 
         <p>
             Selecione o patrimônio que será retirado.
@@ -34,6 +38,7 @@
                 action="{{ route('asset-exits.store') }}"
             >
                 @csrf
+                @isset($movement)<input type="hidden" name="unified" value="1">@endisset
 
                 <p>
                     <label for="asset_id">Equipamento</label><br>

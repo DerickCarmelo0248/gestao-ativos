@@ -71,7 +71,7 @@ class StockExitController extends Controller
         }
 
         return redirect()
-            ->route('stock-exits.create')
+            ->route($request->boolean('unified') ? 'movements.exit' : 'stock-exits.create', $request->boolean('unified') ? ['item_id' => $balance->item_id] : [])
             ->with('status', $message);
     }
 }

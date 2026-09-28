@@ -58,7 +58,7 @@ class AssetBatchController extends Controller
         );
 
         return redirect()
-            ->route('assets.batch.create')
+            ->route($request->boolean('unified') ? 'movements.entry' : 'assets.batch.create', $request->boolean('unified') ? ['item_id' => $request->validated('item_id')] : [])
             ->with(
                 'status',
                 "{$quantity} equipamentos cadastrados com sucesso."

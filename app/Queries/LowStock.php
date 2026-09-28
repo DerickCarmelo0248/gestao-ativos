@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class LowStock
 {
-    public static function query(): Builder
+    public static function query(bool $zeroOnly = false): Builder
     {
         $assets = DB::table('assets')->select('item_id', 'unit_id')
             ->selectRaw("COUNT(*) FILTER (WHERE status = 'available') AS available")
@@ -22,14 +22,18 @@ class LowStock
             })
             ->where('i.is_active', true)->where('u.is_active', true)
             ->where(function ($query) {
-                $query->where('i.minimum_stock', '>', 0)
+                $query->where(fn ($q) => $q->where('i.minimum_stock_enabled', true)->where('i.minimum_stock', '>', 0))
                     ->orWhereNotNull('b.id')->orWhereNotNull('a.item_id');
             })
             ->select('i.id as item_id', 'i.name', 'i.code', 'i.tracking_type',
-                'i.minimum_stock', 'u.id as unit_id', 'u.name as unit_name', 'b.id as balance_id')
+                'i.minimum_stock', 'i.minimum_stock_enabled', 'u.id as unit_id', 'u.name as unit_name', 'b.id as balance_id')
             ->selectRaw("CASE WHEN i.tracking_type = 'individual' THEN COALESCE(a.available, 0) ELSE COALESCE(b.quantity, 0) END AS quantity");
 
-        return DB::query()->fromSub($balances, 'inventory')
+        $query = DB::query()->fromSub($balances, 'inventory');
+        if ($zeroOnly) {
+            return $query->where('quantity', 0);
+        }
+        return $query->where('minimum_stock_enabled', true)
             ->whereColumn('quantity', '<=', 'minimum_stock');
     }
 }

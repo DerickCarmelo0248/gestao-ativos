@@ -58,7 +58,7 @@ class StockEntryController extends Controller
         );
 
         return redirect()
-            ->route('stock-entries.create')
+            ->route($request->boolean('unified') ? 'movements.entry' : 'stock-entries.create', $request->boolean('unified') ? ['item_id' => $balance->item_id] : [])
             ->with(
                 'status',
                 "Entrada registrada. Saldo após esta operação: {$balance->quantity} unidades."
