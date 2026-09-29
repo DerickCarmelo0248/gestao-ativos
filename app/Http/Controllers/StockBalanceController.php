@@ -9,17 +9,24 @@ use App\Models\StockMovement;
 
 class StockBalanceController extends Controller
 {
-    public function index(): View
+    public function index(\Illuminate\Http\Request $request): View
     {
         Gate::authorize('viewAny', StockBalance::class);
 
+        $filters = $request->validate([
+            'item_id' => ['nullable', 'integer', 'exists:items,id'],
+            'unit_id' => ['nullable', 'integer', 'exists:units,id'],
+        ]);
+        $selectedItem = ! empty($filters['item_id']) ? \App\Models\Item::findOrFail($filters['item_id']) : null;
         $balances = StockBalance::query()
+            ->when($selectedItem, fn ($q) => $q->where('item_id', $selectedItem->id))
+            ->when(! empty($filters['unit_id']), fn ($q) => $q->where('unit_id', $filters['unit_id']))
             ->with(['item', 'unit'])
             ->orderBy('item_id')
             ->orderBy('unit_id')
-            ->paginate(15);
+            ->paginate(15)->withQueryString();
 
-        return view('stock-balances.index', compact('balances'));
+        return view('stock-balances.index', compact('balances', 'selectedItem'));
     }
 
     public function show(StockBalance $stockBalance): View

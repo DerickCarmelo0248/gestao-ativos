@@ -4,7 +4,8 @@
 <div class="module-page">
 
     
-        <a href="{{ route('dashboard') }}">Voltar ao painel</a>
+        <a href="{{ route('assets.index') }}">Voltar aos modelos</a>
+        @if ($selectedItem)<h2>{{ $selectedItem->name }} — {{ $selectedItem->code }}</h2>@endif
 
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Estoque por quantidade</h1></div>
 
