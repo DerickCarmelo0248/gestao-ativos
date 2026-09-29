@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\Item;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -56,12 +57,22 @@ class AssetController extends Controller
         $filters = $request->validate([
             'patrimony' => ['nullable', 'string', 'max:50'],
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
+            'item_id' => ['nullable', 'integer', 'exists:items,id'],
+            'search' => ['nullable', 'string', 'max:150'],
         ]);
 
         $query = Asset::query()
             ->with(['item', 'unit']);
 
         $patrimony = trim($filters['patrimony'] ?? '');
+
+        if (empty($filters['item_id']) && $patrimony === '') {
+            return $this->models($filters);
+        }
+        $selectedItem = ! empty($filters['item_id']) ? Item::findOrFail($filters['item_id']) : null;
+        if ($selectedItem) {
+            $query->where('item_id', $selectedItem->id);
+        }
 
         if ($patrimony !== '') {
             $query->where('patrimony', $patrimony);
@@ -91,8 +102,33 @@ class AssetController extends Controller
 
         return view(
             'assets.index',
-            compact('assets', 'units', 'statuses', 'filters')
+            compact('assets', 'units', 'statuses', 'filters', 'selectedItem')
         );
+    }
+
+    private function models(array $filters): View
+    {
+        $assetTotals = DB::table('assets')->select('item_id')
+            ->when(! empty($filters['unit_id']), fn ($q) => $q->where('unit_id', $filters['unit_id']))
+            ->selectRaw("COUNT(*) FILTER (WHERE status = 'available') AS available,
+                COUNT(*) FILTER (WHERE status = 'in_use') AS in_use,
+                COUNT(*) FILTER (WHERE status IN ('awaiting_disposal', 'in_container')) AS disposal,
+                COUNT(*) FILTER (WHERE status = 'disposed') AS disposed")
+            ->groupBy('item_id');
+        $stockTotals = DB::table('stock_balances')->select('item_id')->selectRaw('SUM(quantity) AS quantity')
+            ->when(! empty($filters['unit_id']), fn ($q) => $q->where('unit_id', $filters['unit_id']))
+            ->groupBy('item_id');
+        $search = trim($filters['search'] ?? '');
+        $models = DB::table('items as i')
+            ->leftJoinSub($assetTotals, 'a', 'a.item_id', '=', 'i.id')
+            ->leftJoinSub($stockTotals, 's', 's.item_id', '=', 'i.id')
+            ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q->where('i.name', 'ilike', '%'.$search.'%')->orWhere('i.code', 'ilike', '%'.$search.'%')))
+            ->select('i.id', 'i.name', 'i.code', 'i.tracking_type', 'i.is_active')
+            ->selectRaw("CASE WHEN i.tracking_type = 'individual' THEN COALESCE(a.available, 0) ELSE COALESCE(s.quantity, 0) END AS available,
+                COALESCE(a.in_use, 0) AS in_use, COALESCE(a.disposal, 0) AS disposal, COALESCE(a.disposed, 0) AS disposed")
+            ->orderBy('i.name')->orderBy('i.id')->paginate(15)->withQueryString();
+        $units = Unit::orderBy('name')->get(['id', 'name']);
+        return view('assets.models', compact('models', 'units', 'filters'));
     }
 
     public function show(Asset $asset): View

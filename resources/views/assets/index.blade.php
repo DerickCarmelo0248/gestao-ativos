@@ -4,7 +4,8 @@
 <div class="module-page">
 
     
-        <a href="{{ route('dashboard') }}">Voltar ao painel</a>
+        <a href="{{ route('assets.index', array_filter(['unit_id' => $filters['unit_id'] ?? null])) }}">Voltar aos modelos</a>
+        @if ($selectedItem)<h2>{{ $selectedItem->name }} — {{ $selectedItem->code }}</h2>@endif
 
         <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / OPERAÇÕES</p><h1>Equipamentos</h1></div>
 
@@ -19,6 +20,7 @@
         
 
         <form method="GET" action="{{ route('assets.index') }}">
+            @if ($selectedItem)<input type="hidden" name="item_id" value="{{ $selectedItem->id }}">@endif
             <p>
                 <label for="patrimony">Patrimônio completo</label><br>
                 <input
