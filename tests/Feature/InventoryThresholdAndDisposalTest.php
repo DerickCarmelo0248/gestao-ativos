@@ -80,7 +80,7 @@ class InventoryThresholdAndDisposalTest extends TestCase
         $this->assertDatabaseHas('items', ['code' => $data['code'], 'minimum_stock' => 5]);
     }
 
-    public function test_alerts_include_threshold_and_missing_balances_separately_per_unit(): void
+    public function test_alerts_only_include_units_with_registered_stock(): void
     {
         $item = $this->item();
         $unit = $this->unit();
@@ -88,11 +88,18 @@ class InventoryThresholdAndDisposalTest extends TestCase
         DB::table('stock_balances')->insert(['item_id' => $item->id, 'unit_id' => $unit->id, 'quantity' => 3]);
         $query = fn () => LowStock::query()->where('item_id', $item->id);
         $this->assertSame(3, (int) $query()->where('unit_id', $unit->id)->value('quantity'));
-        $this->assertSame(0, (int) $query()->where('unit_id', $other->id)->value('quantity'));
+        $this->assertFalse($query()->where('unit_id', $other->id)->exists());
+        $this->assertFalse(LowStock::query(true)->where('item_id', $item->id)->where('unit_id', $other->id)->exists());
         DB::table('stock_balances')->where('item_id', $item->id)->update(['quantity' => 4]);
         $this->assertFalse($query()->where('unit_id', $unit->id)->exists());
         $this->get(route('dashboard', ['search' => $item->code, 'unit_id' => $other->id]))
-            ->assertOk()->assertSee($item->name)->assertSee('Sem saldo');
+            ->assertOk()->assertViewHas('lowBalances', fn ($rows) => $rows->total() === 0);
+        DB::table('stock_balances')->where('item_id', $item->id)->update(['quantity' => 0]);
+        foreach ([false, true] as $zeroOnly) {
+            $rows = LowStock::query($zeroOnly)->where('item_id', $item->id)->get();
+            $this->assertCount(1, $rows);
+            $this->assertSame($unit->id, $rows->first()->unit_id);
+        }
         $other->is_active = false;
         $other->save();
         $this->assertFalse($query()->where('unit_id', $other->id)->exists());
