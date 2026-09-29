@@ -22,8 +22,7 @@ class LowStock
             })
             ->where('i.is_active', true)->where('u.is_active', true)
             ->where(function ($query) {
-                $query->where(fn ($q) => $q->where('i.minimum_stock_enabled', true)->where('i.minimum_stock', '>', 0))
-                    ->orWhereNotNull('b.id')->orWhereNotNull('a.item_id');
+                $query->whereNotNull('b.id')->orWhereNotNull('a.item_id');
             })
             ->select('i.id as item_id', 'i.name', 'i.code', 'i.tracking_type',
                 'i.minimum_stock', 'i.minimum_stock_enabled', 'u.id as unit_id', 'u.name as unit_name', 'b.id as balance_id')
