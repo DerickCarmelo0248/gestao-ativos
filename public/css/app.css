@@ -383,3 +383,15 @@ body{font-family:'Segoe UI',Arial,sans-serif;font-size:14px;letter-spacing:-.15p
 .module-page .category-actions { display: flex; align-items: center; gap: 14px; }
 .module-page form.category-delete-form { display: inline-flex; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
 .module-page .category-delete-form button { margin: 0; padding: 8px 12px; }
+
+/* Histórico de saídas: filtros compactos e leitura por linhas. */
+.exit-history .exit-history-filters { display:block; max-width:none; padding:0; border:0; background:transparent; box-shadow:none; }
+.exit-history-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:12px 0; }
+.exit-history .exit-history-toolbar input,.exit-history .exit-history-toolbar select { width:auto; min-width:180px; max-width:100%; margin:0; }
+.exit-history .exit-history-toolbar button { width:auto; margin:0; }
+.exit-history details { margin:12px 0; }
+.exit-history summary { cursor:pointer; }
+.exit-history table { min-width:1100px; }
+.exit-history tbody tr:nth-child(even) { background:#f7f9fb; }
+.exit-history tbody tr:hover { background:#fff5d6; }
+.exit-history td { vertical-align:middle; }
