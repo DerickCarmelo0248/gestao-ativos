@@ -63,6 +63,9 @@
                 @can('recordExit', \App\Models\Asset::class)
                     <a class="nav-link {{ request()->routeIs('movements.exit', 'asset-exits.*', 'stock-exits.*') ? 'active' : '' }}" href="{{ route('movements.exit') }}">Saída</a>
                 @endcan
+                @can('viewAny', \App\Models\Asset::class)
+                    <a class="nav-link {{ request()->routeIs('movements.exit-history') ? 'active' : '' }}" href="{{ route('movements.exit-history') }}">Histórico de saídas</a>
+                @endcan
                 @can('recordReturn', \App\Models\Asset::class)
                     <a
                         class="nav-link {{ request()->routeIs('asset-returns.*') ? 'active' : '' }}"

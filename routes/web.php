@@ -32,6 +32,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/movements/exit-history', [\App\Http\Controllers\ExitHistoryController::class, 'index'])->name('movements.exit-history');
     Route::get('/movements/entry', [\App\Http\Controllers\MovementController::class, 'entry'])->name('movements.entry');
     Route::get('/movements/exit', [\App\Http\Controllers\MovementController::class, 'exit'])->name('movements.exit');
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
