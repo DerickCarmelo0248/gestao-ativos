@@ -27,7 +27,7 @@
             @php($m = $exit->movement)
             @php($item = $exit->kind === 'asset' ? $m->asset->item : $m->item)
             <tr>
-                <td>{{ $m->created_at->copy()->timezone('America/Sao_Paulo')->format('d/m/Y H:i') }}</td>
+                <td>{{ $m->created_at->copy()->timezone('America/Sao_Paulo')->format('d/m/Y') }}</td>
                 <td>{{ $item->name }}<br><small>{{ $item->code }}</small></td>
                 <td>{{ $exit->kind === 'asset' ? 1 : $m->quantity }}</td>
                 <td>{{ $m->ticket_number ?? '—' }}</td>
