@@ -40,7 +40,7 @@
                             </a>
                         </td>
                         <td>{{ $balance->unit->name }}</td>
-                        <td>{{ $balance->quantity }}</td>
+                        <td>{{ $balance->quantity }} @can('adjust', $balance)<br><a href="{{ route('stock-balances.show', $balance) }}#adjust-stock">Ajustar quantidade</a>@endcan</td>
                     </tr>
                 @empty
                     <tr>

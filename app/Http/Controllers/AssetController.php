@@ -59,6 +59,8 @@ class AssetController extends Controller
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
             'item_id' => ['nullable', 'integer', 'exists:items,id'],
             'search' => ['nullable', 'string', 'max:150'],
+            'tracking_type' => ['nullable', 'in:individual,quantity'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
         ]);
 
         $query = Asset::query()
@@ -120,6 +122,8 @@ class AssetController extends Controller
             ->groupBy('item_id');
         $search = trim($filters['search'] ?? '');
         $models = DB::table('items as i')
+            ->when(! empty($filters['category_id']), fn ($q) => $q->where('i.category_id', $filters['category_id']))
+            ->when(! empty($filters['tracking_type']), fn ($q) => $q->where('i.tracking_type', $filters['tracking_type']))
             ->leftJoinSub($assetTotals, 'a', 'a.item_id', '=', 'i.id')
             ->leftJoinSub($stockTotals, 's', 's.item_id', '=', 'i.id')
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q->where('i.name', 'ilike', '%'.$search.'%')->orWhere('i.code', 'ilike', '%'.$search.'%')))
@@ -128,7 +132,8 @@ class AssetController extends Controller
                 COALESCE(a.in_use, 0) AS in_use, COALESCE(a.disposal, 0) AS disposal, COALESCE(a.disposed, 0) AS disposed")
             ->orderBy('i.name')->orderBy('i.id')->paginate(15)->withQueryString();
         $units = Unit::orderBy('name')->get(['id', 'name']);
-        return view('assets.models', compact('models', 'units', 'filters'));
+        $categories = \App\Models\Category::orderBy('name')->get(['id', 'name']);
+        return view('assets.models', compact('models', 'units', 'filters', 'categories'));
     }
 
     public function show(Asset $asset): View

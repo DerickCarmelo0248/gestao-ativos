@@ -1,15 +1,30 @@
 @extends('layouts.app')
-@section('title', 'Consulta por modelo')
+@section('title', 'Estoque')
 @section('content')
 <div class="module-page">
-    <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / CONSULTAS</p><h1>Equipamentos e itens por modelo</h1></div>
+    <div class="page-heading"><p class="eyebrow">GESTÃO DE ATIVOS / CONSULTAS</p><h1>Estoque</h1></div>
     <p>Selecione um modelo para consultar seus patrimônios ou os saldos por unidade.</p>
     <form method="GET" action="{{ route('assets.index') }}">
         <p><label for="search">Nome ou código do modelo</label><br><input id="search" name="search" maxlength="150" value="{{ $filters['search'] ?? '' }}"></p>
         <p><label for="unit_id">Unidade</label><br><select id="unit_id" name="unit_id"><option value="">Todas as unidades</option>
             @foreach ($units as $unit)<option value="{{ $unit->id }}" @selected(($filters['unit_id'] ?? '') == $unit->id)>{{ $unit->name }}</option>@endforeach
         </select></p>
-        <button type="submit">Filtrar modelos</button> <a href="{{ route('assets.index') }}">Limpar filtros</a>
+        <p><label for="tracking_type">Tipo de controle</label><br>
+            <select id="tracking_type" name="tracking_type">
+                <option value="">Todos os tipos</option>
+                <option value="individual" @selected(($filters['tracking_type'] ?? '') === 'individual')>Com patrimônio</option>
+                <option value="quantity" @selected(($filters['tracking_type'] ?? '') === 'quantity')>Por quantidade</option>
+            </select>
+        </p>
+        <p><label for="category_id">Categoria</label><br>
+            <select id="category_id" name="category_id">
+                <option value="">Todas as categorias</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" @selected(($filters['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </p>
+        <button type="submit">Filtrar estoque</button> <a href="{{ route('assets.index') }}">Limpar filtros</a>
     </form>
     <form method="GET" action="{{ route('assets.index') }}">
         <p><label for="patrimony">Buscar diretamente por patrimônio completo</label><br><input id="patrimony" name="patrimony" maxlength="50" required></p>

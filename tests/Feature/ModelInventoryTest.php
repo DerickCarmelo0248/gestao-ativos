@@ -91,4 +91,18 @@ class ModelInventoryTest extends TestCase
         $response = $this->get(route('assets.index', ['search' => $item->code]))->assertOk()->assertSee('Sem estoque');
         $this->assertSame(0, (int) $response->viewData('models')->first()->available);
     }
-}
+    public function test_stock_can_be_filtered_by_tracking_type(): void
+    {
+        $this->signIn('operator');
+        $prefix = 'FILTER-'.bin2hex(random_bytes(4));
+        foreach (['individual', 'quantity'] as $type) {
+            Item::create(['category_id' => $this->category()->id, 'name' => $prefix.' '.$type, 'code' => $prefix.'-'.$type, 'tracking_type' => $type]);
+        }
+        $this->get(route('assets.index', ['search' => $prefix]))->assertOk()
+            ->assertViewHas('models', fn ($rows) => $rows->total() === 2);
+        foreach (['individual', 'quantity'] as $type) {
+            $this->get(route('assets.index', ['search' => $prefix, 'tracking_type' => $type]))->assertOk()
+                ->assertViewHas('models', fn ($rows) => $rows->total() === 1 && $rows->first()->tracking_type === $type);
+        }
+        $this->getJson(route('assets.index', ['tracking_type' => 'invalid']))->assertUnprocessable();
+    }}

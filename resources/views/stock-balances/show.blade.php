@@ -21,8 +21,22 @@
             <dd>{{ $stockBalance->quantity }}</dd>
         </dl>
 
-        <h2>Histórico de movimentações</h2>
 
+        @can('adjust', $stockBalance)
+            <details id="adjust-stock">
+                <summary>Ajustar quantidade</summary>
+                <p>Informe o saldo final desta unidade. O ajuste ficará registrado no histórico.</p>
+                <form method="POST" action="{{ route('stock-balances.adjust', $stockBalance) }}">
+                    @csrf @method('PUT')
+                    <input type="hidden" name="expected_quantity" value="{{ old('expected_quantity', $stockBalance->quantity) }}">
+                    <p><label for="quantity">Novo saldo</label><br><input id="quantity" name="quantity" type="number" min="0" max="2147483647" step="1" value="{{ old('quantity', $stockBalance->quantity) }}" required></p>
+                    <p><label for="reason">Motivo do ajuste</label><br><textarea id="reason" name="reason" maxlength="2000" rows="2" required>{{ old('reason') }}</textarea></p>
+                    <button type="submit">Salvar novo saldo</button>
+                </form>
+            </details>
+        @endcan
+
+        <h2>Histórico de movimentações</h2>
         <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
                 <tr>

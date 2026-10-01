@@ -107,6 +107,7 @@ class DashboardController extends Controller
             ->take(6)->values();
 
         $eventLabels = [
+            'adjustment_add' => 'Ajuste: acréscimo', 'adjustment_remove' => 'Ajuste: redução',
             'entry' => 'Entrada', 'exit' => 'Saída', 'return' => 'Devolução',
             'replacement' => 'Reposição', 'container_entry' => 'Na caçamba',
             'disposal' => 'Descarte',

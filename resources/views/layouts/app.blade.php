@@ -39,21 +39,14 @@
 
                 @can('viewAny', \App\Models\Asset::class)
                     <a
-                        class="nav-link {{ request()->routeIs('assets.index', 'assets.show') ? 'active' : '' }}"
+                        class="nav-link {{ request()->routeIs('assets.index', 'assets.show', 'assets.edit', 'stock-balances.*') ? 'active' : '' }}"
                         href="{{ route('assets.index') }}"
                     >
-                        Equipamentos
+                        Estoque
                     </a>
                 @endcan
 
-                @can('viewAny', \App\Models\StockBalance::class)
-                    <a
-                        class="nav-link {{ request()->routeIs('stock-balances.*') ? 'active' : '' }}"
-                        href="{{ route('stock-balances.index') }}"
-                    >
-                        Estoque por quantidade
-                    </a>
-                @endcan
+
 
                 <p class="nav-heading">Movimentações</p>
 
