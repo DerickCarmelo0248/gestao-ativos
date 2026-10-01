@@ -221,5 +221,6 @@
     </script>
 
     @stack('scripts')
+    <script src="{{ asset('js/item-search.js') }}?v=2"></script>
 </body>
 </html>
