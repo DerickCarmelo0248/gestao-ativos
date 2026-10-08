@@ -24,3 +24,8 @@ Homestead.yaml
 Thumbs.db
 .env.testing
 /backups/
+
+*.dump
+*.backup
+.env.*
+!.env.example
