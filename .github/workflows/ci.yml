@@ -82,7 +82,22 @@ jobs:
       - name: Compilar telas Blade
         run: php artisan view:cache
       - name: Executar testes
-        run: php artisan test
+        run: php artisan test --log-junit=storage/logs/junit.xml
+      - name: Resumir testes sem dados sensiveis
+        if: always()
+        run: php scripts/ci/test-summary.php
+
+  operations:
+    name: Scripts operacionais
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validar sintaxe PowerShell sem executar implantação
+        shell: pwsh
+        run: ./scripts/ci/check-powershell.ps1
 
   frontend:
     name: Frontend e dependencias
@@ -95,6 +110,10 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Verificar JavaScript servido diretamente
+        run: node scripts/ci/check-javascript.mjs
       - name: Instalar dependencias fixadas sem scripts de instalacao
         run: npm ci --ignore-scripts --no-fund
       - name: Bloquear vulnerabilidades moderadas ou superiores
@@ -139,7 +158,7 @@ jobs:
   gate:
     name: CI aprovada
     if: always()
-    needs: [php, frontend, secrets, sast]
+    needs: [php, frontend, secrets, sast, operations]
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
@@ -147,4 +166,5 @@ jobs:
         env:
           RESULTS: ${{ toJSON(needs) }}
         run: |
+          echo "$RESULTS" | jq -r 'to_entries[] | "- \(.key): \(.value.result)"' >> "$GITHUB_STEP_SUMMARY"
           echo "$RESULTS" | jq -e 'all(.[]; .result == "success")'

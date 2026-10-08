@@ -12,7 +12,7 @@ foreach ($files as $file) {
     $base = basename($file);
     if (($base === '.env' || str_starts_with($base, '.env.')) && $base !== '.env.example') {
         $forbidden[] = $file;
-    } elseif (preg_match('~(^|/)(auth\.json|id_rsa|id_ed25519)$|\.(pfx|p12|key)$|^(backups|vendor|node_modules)/~i', $file)) {
+    } elseif (preg_match('~(^|/)(auth\.json|id_rsa|id_ed25519)$|\.(pfx|p12|key|dump|backup)$|^(backups|vendor|node_modules)/~i', $file)) {
         $forbidden[] = $file;
     }
 }
