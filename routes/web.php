@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/items/{item}', [ItemController::class, 'destroy'])->whereNumber('item')->name('items.destroy');
     Route::get('/assets/{asset}/edit', [AssetController::class, 'edit'])
         ->whereNumber('asset')->name('assets.edit');
+    Route::delete('/assets/{asset}', [AssetController::class, 'destroy'])
+        ->whereNumber('asset')->name('assets.destroy');
     Route::put('/assets/{asset}', [AssetController::class, 'update'])
         ->whereNumber('asset')->name('assets.update');
     Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
