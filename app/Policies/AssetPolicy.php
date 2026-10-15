@@ -7,6 +7,11 @@ use App\Models\Asset;
 
 class AssetPolicy
 {
+    public function delete(User $user, Asset $asset): bool
+    {
+        return $user->role === 'admin';
+    }
+
     public function update(User $user, Asset $asset): bool
     {
         return $user->role === 'admin' && ! in_array($asset->status, ['in_container', 'disposed'], true);

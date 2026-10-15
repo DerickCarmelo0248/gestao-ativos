@@ -16,6 +16,52 @@ use Illuminate\Validation\ValidationException;
 
 class AssetController extends Controller
 {
+    public function destroy(Request $request, Asset $asset): RedirectResponse
+    {
+        Gate::authorize('delete', $asset);
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+            'confirmation' => ['required', 'string', 'max:50'],
+        ]);
+        try {
+            DB::transaction(function () use ($request, $asset, $data) {
+                $locked = Asset::query()->lockForUpdate()->findOrFail($asset->id);
+                Gate::authorize('delete', $locked);
+                if ($data['confirmation'] !== $locked->patrimony) {
+                    throw ValidationException::withMessages(['confirmation' => 'Digite o patrimônio exatamente como aparece no cadastro.']);
+                }
+                if ($locked->status !== 'available'
+                    || $locked->movements()->where('type', '!=', 'entry')->exists()
+                    || DB::table('asset_replacement_requests')->where('replacement_asset_id', $locked->id)->exists()
+                    || DB::table('disposal_container_items')->where('asset_id', $locked->id)->exists()) {
+                    throw ValidationException::withMessages(['asset' => 'Não é possível excluir: o equipamento já foi utilizado em movimentações, reposição ou descarte.']);
+                }
+                $locked->load(['item', 'unit']);
+                DB::table('asset_deletions')->insert([
+                    'original_asset_id' => $locked->id,
+                    'user_id' => $request->user()->id,
+                    'reason' => $data['reason'],
+                    'snapshot' => json_encode([
+                        'asset' => $locked->toArray(),
+                        'movements' => $locked->movements()->get()->toArray(),
+                        'edits' => DB::table('asset_edits')->where('asset_id', $locked->id)->get()->toArray(),
+                    ], JSON_THROW_ON_ERROR),
+                    'created_at' => now(),
+                ]);
+                DB::table('asset_edits')->where('asset_id', $locked->id)->delete();
+                $locked->movements()->delete();
+                $locked->delete();
+            });
+        } catch (\Illuminate\Database\QueryException $exception) {
+            if ($exception->getCode() !== '23503') {
+                throw $exception;
+            }
+            throw ValidationException::withMessages(['asset' => 'Não é possível excluir: existem registros vinculados ao equipamento.']);
+        }
+        return redirect()->route('assets.index', ['item_id' => $asset->item_id, 'unit_id' => $asset->unit_id])
+            ->with('status', 'Equipamento excluído. A exclusão foi registrada para auditoria.');
+    }
+
     public function edit(Asset $asset): View
     {
         Gate::authorize('update', $asset);
