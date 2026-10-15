@@ -13,6 +13,21 @@
         @can('update', $asset)
             <p><a class="button" href="{{ route('assets.edit', $asset) }}">Editar equipamento</a></p>
         @endcan
+        @can('delete', $asset)
+            <details id="delete-asset" @if ($errors->any()) open @endif>
+                <summary>Excluir equipamento</summary>
+                <p>Use apenas para corrigir um cadastro incorreto. Equipamentos com saídas, reposição ou descarte não podem ser excluídos. A exclusão é permanente e fica registrada para auditoria.</p>
+                <form method="POST" action="{{ route('assets.destroy', $asset) }}">
+                    @csrf
+                    @method('DELETE')
+                    <p><label for="delete-reason">Motivo da exclusão</label>
+                    <textarea id="delete-reason" name="reason" required maxlength="1000">{{ old('reason') }}</textarea></p>
+                    <p><label for="delete-confirmation">Digite o patrimônio {{ $asset->patrimony }} para confirmar</label>
+                    <input id="delete-confirmation" name="confirmation" required maxlength="50" autocomplete="off" value="{{ old('confirmation') }}"></p>
+                    <button type="submit">Excluir definitivamente</button>
+                </form>
+            </details>
+        @endcan
         <dl>
             <dt>Item/modelo</dt>
             <dd>{{ $asset->item->name }}</dd>

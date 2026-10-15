@@ -64,7 +64,7 @@
                     <th scope="col">Item/modelo</th>
                     <th scope="col">Número de série</th>
                     <th scope="col">Unidade</th>
-                    <th scope="col">Situação</th>
+                    <th scope="col">Situação</th>@if (auth()->user()->role === 'admin')<th scope="col">Ações</th>@endif
                 </tr>
             </thead>
             <tbody>
@@ -81,13 +81,12 @@
                         <td>
                             {{ $statuses[$asset->status] ?? $asset->status }}
                         </td>
+                        @if (auth()->user()->role === 'admin')
+                            <td><a href="{{ route('assets.show', $asset) }}#delete-asset">Excluir equipamento</a></td>
+                        @endif
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="5">
-                            Nenhum equipamento encontrado.
-                        </td>
-                    </tr>
+                    <tr><td colspan="{{ auth()->user()->role === 'admin' ? 6 : 5 }}">Nenhum equipamento encontrado.</td></tr>
                 @endforelse
             </tbody>
         </table></div>
