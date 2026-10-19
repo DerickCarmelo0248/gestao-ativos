@@ -25,9 +25,11 @@ class StoreAssetExitRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'asset_ids' => ['required_without:asset_id', 'array', 'min:1', 'max:500'],
+            'asset_ids.*' => ['required', 'integer', 'distinct', Rule::exists('assets', 'id')->where('status', 'available')],
             'asset_id' => [
                 'bail',
-                'required',
+                'required_without:asset_ids', 'prohibits:asset_ids',
                 'integer',
                 Rule::exists('assets', 'id')
                     ->where('status', 'available'),
@@ -76,6 +78,9 @@ class StoreAssetExitRequest extends FormRequest
             'required' => 'O campo :attribute é obrigatório.',
             'integer' => 'Selecione um valor válido para :attribute.',
             'string' => 'O campo :attribute deve ser um texto.',
+            'asset_ids.required_without' => 'Selecione pelo menos um patrimônio.',
+            'asset_ids.*.distinct' => 'Não repita o mesmo patrimônio.',
+            'asset_ids.*.exists' => 'Um dos equipamentos selecionados não está mais disponível.',
             'asset_id.exists' => 'Selecione um equipamento disponível no estoque.',
             'technician_id.exists' => 'Selecione um técnico ativo.',
             'ticket_number.max' => 'O chamado deve ter até 100 caracteres.',

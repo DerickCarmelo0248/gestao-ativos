@@ -13,8 +13,8 @@
         @endisset
 
         <p>
-            Selecione o patrimônio que será retirado.
-            Cada envio registra a saída de um equipamento.
+            Selecione os patrimônios que serão retirados.
+            O chamado, técnico e destino serão os mesmos para todos os selecionados.
         </p>
 
         
@@ -40,28 +40,24 @@
                 @csrf
                 @isset($movement)<input type="hidden" name="unified" value="1">@endisset
 
-                <p>
-                    <label for="asset_id">Equipamento</label><br>
-
-                    <select id="asset_id" name="asset_id" required>
-                        <option value="">Selecione o patrimônio</option>
-
-                        @foreach ($assets as $asset)
-                            <option
-                                value="{{ $asset->id }}"
-                                @selected(
-                                    (string) old('asset_id') ===
-                                    (string) $asset->id
-                                )
-                            >
-                                {{ $asset->patrimony }}
-                                — {{ $asset->item->name }}
-                                — Estoque: {{ $asset->unit->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </p>
-
+                <fieldset style="grid-column: 1 / -1; min-width: 0; border: 1px solid #dce3ed; border-radius: 8px; padding: 16px;">
+                    <legend>Equipamentos para saída</legend>
+                    <label for="asset-search">Pesquisar patrimônio ou unidade</label>
+                    <input id="asset-search" type="search" placeholder="Digite para encontrar..." autocomplete="off">
+                    <p><button type="button" id="select-visible">Selecionar resultados</button>
+                    <button type="button" id="clear-selection">Limpar seleção</button></p>
+                    <p id="asset-selection-count" aria-live="polite"></p>
+                    <div style="max-height: 280px; overflow-y: auto;">
+                    @foreach ($assets as $asset)
+                        <label data-asset-row style="display: flex; align-items: center; gap: 12px; padding: 8px;">
+                            <input type="checkbox" name="asset_ids[]" value="{{ $asset->id }}"
+                                style="width: auto; flex: none;"
+                                @checked(in_array((string) $asset->id, array_map('strval', (array) old('asset_ids', old('asset_id') ? [old('asset_id')] : [])), true))>
+                            <span>{{ $asset->patrimony }} — {{ $asset->item->name }} — Estoque: {{ $asset->unit->name }}</span>
+                        </label>
+                    @endforeach
+                    </div>
+                </fieldset>
                 <p>
                     <label for="technician_id">Técnico que levou</label><br>
 
@@ -160,7 +156,7 @@
                 </p>
 
                 <p>
-                    Ao marcar, será criada uma pendência de um equipamento
+                    Ao marcar, será criada uma pendência para cada equipamento selecionado
                     para o estoque de origem. O estabelecimento e o setor
                     de destino serão os responsáveis pelo custo.
                     O equipamento recebido como reposição terá patrimônio próprio.
@@ -182,8 +178,35 @@
             </form>
 
             <script>
+                const rows = [...document.querySelectorAll('[data-asset-row]')];
+                const checkboxes = rows.map(row => row.querySelector('input'));
+                const count = document.getElementById('asset-selection-count');
+                function updateSelection() {
+                    count.textContent = checkboxes.filter(input => input.checked).length + ' patrimônio(s) selecionado(s)';
+                }
+                const normalize = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                document.getElementById('asset-search').addEventListener('input', event => {
+                    const search = normalize(event.target.value.trim());
+                    rows.forEach(row => { row.style.display = normalize(row.textContent).includes(search) ? 'flex' : 'none'; });
+                });
+                document.getElementById('select-visible').addEventListener('click', () => {
+                    rows.filter(row => row.style.display !== 'none').forEach(row => { row.querySelector('input').checked = true; });
+                    updateSelection();
+                });
+                document.getElementById('clear-selection').addEventListener('click', () => {
+                    checkboxes.forEach(input => { input.checked = false; });
+                    updateSelection();
+                });
+                checkboxes.forEach(input => input.addEventListener('change', updateSelection));
+                updateSelection();
                 document.getElementById('asset-exit-form')
-                    .addEventListener('submit', () => {
+                    .addEventListener('submit', event => {
+                        if (!checkboxes.some(input => input.checked)) {
+                            event.preventDefault();
+                            count.textContent = 'Selecione pelo menos um patrimônio.';
+                            document.getElementById('asset-search').focus();
+                            return;
+                        }
                         const button = document.getElementById('submit-button');
 
                         button.disabled = true;
