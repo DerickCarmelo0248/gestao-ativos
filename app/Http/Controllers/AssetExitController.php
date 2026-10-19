@@ -58,15 +58,16 @@ class AssetExitController extends Controller
         StoreAssetExitRequest $request,
         RegisterAssetExit $action
     ): RedirectResponse {
-        $asset = $action->handle(
+        $registered = $action->handleMany(
             $request->validated(),
             $request->user()
         );
 
-        $message = "Saída do patrimônio {$asset->patrimony} registrada.";
+        $asset = $registered->first();
+        $message = "Saída de {$registered->count()} equipamento(s) registrada.";
 
         if ($request->boolean('replacement_required')) {
-            $message .= ' Pendência de reposição criada.';
+            $message .= ' Uma pendência de reposição criada para cada equipamento.';
         }
 
         return redirect()
