@@ -262,6 +262,11 @@
 @endcan
 
         <h2>Materiais incluídos</h2>
+        <p>Exportar todos os materiais desta caçamba:
+            <a href="{{ route('disposal-containers.export', ['container' => $container, 'format' => 'pdf-simple']) }}">PDF simples</a> ·
+            <a href="{{ route('disposal-containers.export', ['container' => $container, 'format' => 'pdf-detailed']) }}">PDF detalhado</a> ·
+            <a href="{{ route('disposal-containers.export', ['container' => $container, 'format' => 'xlsx']) }}">Excel</a>
+        </p>
 
         <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
             <thead>
