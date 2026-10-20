@@ -18,11 +18,24 @@ class RegisterAssetExit
      * Recebe dados validados pelo StoreAssetExitRequest
      * e o usuário autenticado.
      */
-    public function handle(array $data, User $user): Asset
+    public function handleMany(array $data, User $user): \Illuminate\Support\Collection
+    {
+        Gate::forUser($user)->authorize('recordExit', Asset::class);
+        return DB::transaction(function () use ($data, $user) {
+            $ids = $data['asset_ids'] ?? [$data['asset_id']];
+            sort($ids, SORT_NUMERIC);
+            $batchId = (string) Str::uuid();
+            return collect($ids)->map(function ($id) use ($data, $user, $batchId) {
+                return $this->handle(array_replace($data, ['asset_id' => $id]), $user, $batchId);
+            });
+        }, 3);
+    }
+
+    public function handle(array $data, User $user, ?string $batchId = null): Asset
     {
         Gate::forUser($user)->authorize('recordExit', Asset::class);
 
-        return DB::transaction(function () use ($data, $user): Asset {
+        return DB::transaction(function () use ($data, $user, $batchId): Asset {
             $asset = Asset::query()
                 ->lockForUpdate()
                 ->find($data['asset_id']);
@@ -92,7 +105,7 @@ class RegisterAssetExit
                 'destination_sector_id' =>
                     $data['destination_sector_id'],
                 'replacement_required' => $replacementRequired,
-                'batch_id' => (string) Str::uuid(),
+                'batch_id' => $batchId ?? (string) Str::uuid(),
                 'type' => 'exit',
                 'notes' => $data['notes'] ?? null,
                 'created_at' => $now,
