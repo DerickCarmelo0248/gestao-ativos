@@ -78,6 +78,8 @@ Route::post('/items', [ItemController::class, 'store'])
 Route::post('/assets/batch', [AssetBatchController::class, 'store'])
     ->name('assets.batch.store');
 
+    Route::get('/disposal-containers/{container}/export', \App\Http\Controllers\DisposalContainerExportController::class)->whereNumber('container')->name('disposal-containers.export');
+    Route::get('/assets/export', \App\Http\Controllers\AssetExportController::class)->name('assets.export');
     Route::get('/assets', [AssetController::class, 'index'])
     ->name('assets.index');
 

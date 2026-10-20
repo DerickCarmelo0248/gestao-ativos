@@ -101,6 +101,7 @@ class AssetController extends Controller
         Gate::authorize('viewAny', Asset::class);
 
         $filters = $request->validate([
+            'status' => ['nullable', 'in:available,in_use,awaiting_disposal,in_container,disposed'],
             'patrimony' => ['nullable', 'string', 'max:50'],
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
             'item_id' => ['nullable', 'integer', 'exists:items,id'],
@@ -114,7 +115,7 @@ class AssetController extends Controller
 
         $patrimony = trim($filters['patrimony'] ?? '');
 
-        if (empty($filters['item_id']) && $patrimony === '') {
+        if (empty($filters['item_id']) && $patrimony === '' && empty($filters['status'])) {
             return $this->models($filters);
         }
         $selectedItem = ! empty($filters['item_id']) ? Item::findOrFail($filters['item_id']) : null;
@@ -128,6 +129,10 @@ class AssetController extends Controller
 
         if (! empty($filters['unit_id'])) {
             $query->where('unit_id', $filters['unit_id']);
+        }
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
         }
 
         $assets = $query

@@ -51,10 +51,24 @@
                 </select>
             </p>
 
+            <p>
+                <label for="status">Situação</label><br>
+                <select id="status" name="status">
+                    <option value="">Todas as situações</option>
+                    @foreach ($statuses as $value => $label)
+                        <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </p>
             <button type="submit">Filtrar</button>
-            <a href="{{ route('assets.index') }}">Limpar filtros</a>
+            <a href="{{ route('assets.index', array_filter(['item_id' => $selectedItem?->id])) }}">Limpar filtros</a>
         </form>
 
+        <p>Exportar todos os resultados filtrados:
+            <a href="{{ route('assets.export', array_merge(\Illuminate\Support\Arr::only($filters, ['item_id', 'unit_id', 'status', 'patrimony']), ['format' => 'pdf-simple'])) }}">PDF simples</a> ·
+            <a href="{{ route('assets.export', array_merge(\Illuminate\Support\Arr::only($filters, ['item_id', 'unit_id', 'status', 'patrimony']), ['format' => 'pdf-detailed'])) }}">PDF detalhado</a> ·
+            <a href="{{ route('assets.export', array_merge(\Illuminate\Support\Arr::only($filters, ['item_id', 'unit_id', 'status', 'patrimony']), ['format' => 'xlsx'])) }}">Excel</a>
+        </p>
         <p>Total encontrado: {{ $assets->total() }}</p>
 
         <div class="table-wrapper" tabindex="0" role="region" aria-label="Tabela de registros"><table>
