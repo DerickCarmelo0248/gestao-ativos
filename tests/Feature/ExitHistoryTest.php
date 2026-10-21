@@ -59,6 +59,23 @@ class ExitHistoryTest extends TestCase
         DB::table('stock_movements')->insert($base + ['item_id' => $item->id, 'quantity' => 4, 'type' => 'exit']);
         DB::table('stock_movements')->insert($base + ['item_id' => $item->id, 'quantity' => 9, 'type' => 'entry']);
         $filters = ['unit_id' => $unit->id, 'from' => '2026-09-29', 'to' => '2026-09-29'];
+        foreach (['pdf-simple', 'pdf-detailed'] as $format) {
+            $pdf = $this->get(route('movements.exit-history.export', $filters + ['format' => $format]));
+            $pdf->assertOk()->assertHeader('content-type', 'application/pdf');
+            $this->assertStringStartsWith('%PDF-', $pdf->getContent());
+        }
+        $excel = $this->get(route('movements.exit-history.export', $filters + ['format' => 'xlsx']))->assertOk();
+        $file = tempnam(sys_get_temp_dir(), 'exits-');
+        try {
+            file_put_contents($file, $excel->streamedContent());
+            $book = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+            $sheet = $book->getSheetByName('Saídas');
+            $this->assertSame(3, $sheet->getHighestRow());
+            $this->assertSame($asset->patrimony, $sheet->getCell('F2')->getValue());
+            $this->assertSame(4, $sheet->getCell('D3')->getValue());
+            $this->assertSame('29/09/2026', $sheet->getCell('A2')->getValue());
+            $book->disconnectWorksheets();
+        } finally { unlink($file); }
         $response = $this->get(route('movements.exit-history', $filters))->assertOk()->assertSee($asset->patrimony)->assertSee($item->name);
         $this->assertSame(2, $response->viewData('exits')->total());
         $this->get(route('movements.exit-history', $filters + ['kind' => 'stock']))->assertOk()->assertViewHas('exits', fn ($rows) => $rows->total() === 1 && $rows->first()->kind === 'stock');
@@ -70,5 +87,6 @@ class ExitHistoryTest extends TestCase
     public function test_guest_cannot_read_history(): void
     {
         $this->get(route('movements.exit-history'))->assertRedirect(route('login'));
+        $this->get(route('movements.exit-history.export', ['format' => 'xlsx']))->assertRedirect(route('login'));
     }
 }
