@@ -20,6 +20,11 @@
             </div>
         </details>
     </form>
+    <p>Exportar todos os resultados filtrados:
+        <a href="{{ route('movements.exit-history.export', array_merge($filters, ['format' => 'pdf-simple'])) }}">PDF simples</a> ·
+        <a href="{{ route('movements.exit-history.export', array_merge($filters, ['format' => 'pdf-detailed'])) }}">PDF detalhado</a> ·
+        <a href="{{ route('movements.exit-history.export', array_merge($filters, ['format' => 'xlsx'])) }}">Excel</a>
+    </p>
     <p>{{ $exits->total() }} registro(s)</p>
     <div class="table-wrapper"><table>
         <thead><tr><th>Data</th><th>Item/modelo</th><th>Qtd</th><th>Chamado</th><th>Patrimônio</th><th>Origem</th><th>Destino</th><th>Setor</th><th>Técnico</th><th>Usuário</th><th>Observações</th></tr></thead>

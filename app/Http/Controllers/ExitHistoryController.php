@@ -17,6 +17,17 @@ class ExitHistoryController extends Controller
 {
     public function index(Request $request): View
     {
+        return view('movements.exit-history', $this->data($request));
+    }
+
+    public function export(Request $request)
+    {
+        $format = $request->validate(['format' => ['required', 'in:pdf-simple,pdf-detailed,xlsx']])['format'];
+        return app(\App\Services\ExitHistoryExport::class)->download($this->data($request, true), $format);
+    }
+
+    private function data(Request $request, bool $all = false): array
+    {
         Gate::authorize('viewAny', Asset::class);
         Gate::authorize('viewAny', StockBalance::class);
         $filters = $request->validate([
@@ -53,15 +64,16 @@ class ExitHistoryController extends Controller
         $union = $assets->select('id', 'created_at')->selectRaw("'asset' AS kind")->toBase()
             ->unionAll($stock->select('id', 'created_at')->selectRaw("'stock' AS kind")->toBase());
         $exits = DB::query()->fromSub($union, 'exits')->orderByDesc('created_at')->orderBy('kind')->orderByDesc('id')
-            ->paginate(20)->withQueryString();
+            ->when($all, fn ($q) => $q->get(), fn ($q) => $q->paginate(20)->withQueryString());
+        $rows = $all ? $exits : $exits->getCollection();
         $relations = ['unit', 'user', 'technician', 'destinationEstablishment', 'destinationSector', 'legacyDestinationUnit'];
-        $assetRows = AssetMovement::with([...$relations, 'asset.item'])->whereIn('id', $exits->getCollection()->where('kind', 'asset')->pluck('id'))->get()->keyBy('id');
-        $stockRows = StockMovement::with([...$relations, 'item'])->whereIn('id', $exits->getCollection()->where('kind', 'stock')->pluck('id'))->get()->keyBy('id');
-        $exits->getCollection()->transform(function ($row) use ($assetRows, $stockRows) {
+        $assetRows = AssetMovement::with([...$relations, 'asset.item'])->whereIn('id', $rows->where('kind', 'asset')->pluck('id'))->get()->keyBy('id');
+        $stockRows = StockMovement::with([...$relations, 'item'])->whereIn('id', $rows->where('kind', 'stock')->pluck('id'))->get()->keyBy('id');
+        $rows->transform(function ($row) use ($assetRows, $stockRows) {
             $row->movement = ($row->kind === 'asset' ? $assetRows : $stockRows)->get($row->id);
             return $row;
         });
         $units = Unit::orderBy('name')->get();
-        return view('movements.exit-history', compact('exits', 'filters', 'units'));
+        return compact('exits', 'filters', 'units');
     }
 }
