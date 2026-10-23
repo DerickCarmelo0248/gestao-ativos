@@ -191,6 +191,8 @@ Route::post(
     ->whereNumber('container')
     ->name('disposal-containers.close');
 
+    Route::get('/users/{user}/reset-password', [UserController::class, 'resetPasswordForm'])->whereNumber('user')->name('users.password.edit');
+    Route::put('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->whereNumber('user')->middleware('throttle:10,1')->name('users.password.reset');
     Route::get('/users', [UserController::class, 'index'])
     ->name('users.index');
 

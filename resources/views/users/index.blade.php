@@ -120,7 +120,7 @@
                         <th scope="col">Nome</th>
                         <th scope="col">E-mail</th>
                         <th scope="col">Perfil</th>
-                        <th scope="col">Cadastrado em</th>
+                        <th scope="col">Cadastrado em</th><th scope="col">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,14 +146,10 @@
                                     ->timezone('America/Sao_Paulo')
                                     ->format('d/m/Y') ?? '—' }}
                             </td>
+                            <td><a href="{{ route('users.password.edit', $user) }}">Redefinir senha</a></td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="4">
-                                Nenhum usuário encontrado.
-                            </td>
-                        </tr>
-                    @endforelse
+                        <tr><td colspan="5">Nenhum usuário encontrado.</td></tr>                    @endforelse
                 </tbody>
             </table>
         </div>

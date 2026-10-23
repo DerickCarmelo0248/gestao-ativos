@@ -12,6 +12,43 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    public function resetPasswordForm(Request $request, User $user): View
+    {
+        abort_unless($request->user()?->role === 'admin', 403);
+        return view('users.reset-password', compact('user'));
+    }
+
+    public function resetPassword(Request $request, User $user): RedirectResponse
+    {
+        abort_unless($request->user()?->role === 'admin', 403);
+        $data = $request->validate([
+            'current_password' => ['required', 'string', 'current_password:web'],
+            'password' => ['bail', 'required', 'string', 'min:8', 'confirmed',
+                function ($attribute, $value, $fail) {
+                    if (strlen($value) > 72) {
+                        $fail('A nova senha deve ter no máximo 72 bytes.');
+                    }
+                }],
+        ], [
+            'current_password.current_password' => 'Sua senha de administrador está incorreta.',
+            'current_password.required' => 'Confirme sua senha de administrador.',
+            'password.required' => 'Informe a nova senha.',
+            'password.min' => 'Use pelo menos 8 caracteres.',
+            'password.confirmed' => 'A confirmação da nova senha não confere.',
+        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $data) {
+            $locked = User::query()->lockForUpdate()->findOrFail($user->id);
+            $locked->password = $data['password'];
+            $locked->remember_token = \Illuminate\Support\Str::random(60);
+            $locked->save();
+            if (config('session.driver') === 'database') {
+                \Illuminate\Support\Facades\DB::connection(config('session.connection'))
+                    ->table(config('session.table', 'sessions'))->where('user_id', $locked->id)->delete();
+            }
+        });
+        return redirect()->route('users.index')->with('status', "Senha de {$user->name} redefinida com sucesso.");
+    }
+
     public function index(Request $request): View
     {
         abort_unless($request->user()?->role === 'admin', 403);
