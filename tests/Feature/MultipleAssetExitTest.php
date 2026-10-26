@@ -77,6 +77,10 @@ class MultipleAssetExitTest extends TestCase
         $data = $this->data([$one->id, $two->id]);
         $this->get(route('asset-exits.create'))->assertOk()->assertSee('asset_ids[]', false)->assertSee('Selecionar resultados');
         $this->post(route('asset-exits.store'), $data)->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertStringContainsString($one->patrimony, session('email_draft.body'));
+        $this->assertStringContainsString($two->patrimony, session('email_draft.body'));
+        $this->assertStringContainsString('CH-123', session('email_draft.body'));
+        $this->assertStringContainsString('R$ [preencher]', session('email_draft.body'));
         $this->assertSame('in_use', $one->fresh()->status);
         $this->assertSame('in_use', $two->fresh()->status);
         $movements = DB::table('asset_movements')->whereIn('asset_id', [$one->id, $two->id])->get();
@@ -88,6 +92,23 @@ class MultipleAssetExitTest extends TestCase
             $this->assertSame($data['destination_establishment_id'], $movement->destination_establishment_id);
             $this->assertDatabaseHas('asset_replacement_requests', ['asset_movement_id' => $movement->id, 'status' => 'pending']);
         }
+    }
+
+    public function test_invoice_groups_same_model_and_keeps_other_models_separate(): void
+    {
+        $this->signIn('operator');
+        $one = $this->asset();
+        $two = $this->asset();
+        $two->item_id = $one->item_id;
+        $two->save();
+        $three = $this->asset();
+        $data = $this->data([$one->id, $two->id, $three->id]);
+        $this->post(route('asset-exits.store'), $data)->assertSessionHasNoErrors();
+        $body = session('email_draft.body');
+        $this->assertStringContainsString("Patrimônio: {$one->patrimony}, {$two->patrimony}\nValor: R$ [preencher]", $body);
+        $this->assertStringContainsString("Patrimônio: {$three->patrimony}\nValor: R$ [preencher]", $body);
+        $this->assertSame(2, substr_count($body, 'Equipamento: '));
+        $this->assertSame(2, substr_count($body, 'Valor: R$ [preencher]'));
     }
 
     public function test_invalid_selection_and_guest_are_rejected(): void

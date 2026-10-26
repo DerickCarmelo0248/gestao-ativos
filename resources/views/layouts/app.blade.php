@@ -205,6 +205,7 @@
                     </div>
                 @endif
 
+                @include('movements.email-draft')
                 @yield('content')
             </main>
         </div>

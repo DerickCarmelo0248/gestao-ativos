@@ -165,7 +165,7 @@ public function addAsset(
         ->with(
             'status',
             "Patrimônio {$item->patrimony} incluído na caçamba."
-        );
+        )->with('email_draft', \App\Services\MovementEmailDraft::disposal($item));
 }
 
 public function addExternal(
@@ -232,7 +232,7 @@ public function addExternal(
         ->with(
             'status',
             "{$record->quantity} unidade(s) de {$record->item_name} incluída(s) diretamente na caçamba."
-        );
+        )->with('email_draft', \App\Services\MovementEmailDraft::disposal($record));
 }
 
 public function close(
