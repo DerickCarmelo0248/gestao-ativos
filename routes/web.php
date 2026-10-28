@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/stock-balances/{stockBalance}/adjust', [StockBalanceController::class, 'adjust'])->whereNumber('stockBalance')->name('stock-balances.adjust');
     Route::get('/movements/exit-history/export', [\App\Http\Controllers\ExitHistoryController::class, 'export'])->name('movements.exit-history.export');
     Route::get('/movements/exit-history', [\App\Http\Controllers\ExitHistoryController::class, 'index'])->name('movements.exit-history');
+    Route::get('/transfers', [\App\Http\Controllers\InventoryTransferController::class, 'index'])->name('transfers.index');
+    Route::post('/transfers', [\App\Http\Controllers\InventoryTransferController::class, 'store'])->name('transfers.store');
     Route::get('/movements/entry', [\App\Http\Controllers\MovementController::class, 'entry'])->name('movements.entry');
     Route::get('/movements/exit', [\App\Http\Controllers\MovementController::class, 'exit'])->name('movements.exit');
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');

@@ -218,7 +218,8 @@ class AssetController extends Controller
     ];
 
     $movementTypes = [
-        'entry' => 'Entrada',
+        'transfer_out' => 'Transferência enviada', 'transfer_in' => 'Transferência recebida',
+            'entry' => 'Entrada',
         'exit' => 'Saída',
         'replacement' => 'Reposição',
         'return' => 'Devolução',
