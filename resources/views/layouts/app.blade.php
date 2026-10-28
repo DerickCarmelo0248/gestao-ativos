@@ -58,6 +58,7 @@
                 @endcan
                 @can('viewAny', \App\Models\Asset::class)
                     <a class="nav-link {{ request()->routeIs('movements.exit-history') ? 'active' : '' }}" href="{{ route('movements.exit-history') }}">Histórico de saídas</a>
+                    <a class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}" href="{{ route('transfers.index') }}">Transferência entre estoques</a>
                 @endcan
                 @can('recordReturn', \App\Models\Asset::class)
                     <a

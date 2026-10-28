@@ -87,6 +87,7 @@ class StockBalanceController extends Controller
         $movementTypes = [
             'adjustment_add' => 'Ajuste: acréscimo',
             'adjustment_remove' => 'Ajuste: redução',
+            'transfer_out' => 'Transferência enviada', 'transfer_in' => 'Transferência recebida',
             'entry' => 'Entrada',
             'exit' => 'Saída',
             'replacement' => 'Reposição',
