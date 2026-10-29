@@ -12,6 +12,28 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
+    public function editName(Request $request, User $user): View
+    {
+        abort_unless($request->user()?->role === 'admin', 403);
+        return view('users.edit-name', compact('user'));
+    }
+
+    public function updateName(Request $request, User $user): RedirectResponse
+    {
+        abort_unless($request->user()?->role === 'admin', 403);
+        if (is_string($request->input('name'))) {
+            $request->merge(['name' => trim(preg_replace('/\s+/u', ' ', $request->input('name')) ?? '')]);
+        }
+        $data = $request->validate(['name' => ['required', 'string', 'max:255']], [
+            'name.required' => 'Informe o nome do usuário.',
+            'name.string' => 'O nome deve ser um texto.',
+            'name.max' => 'O nome deve ter até 255 caracteres.',
+        ]);
+        $user->name = $data['name'];
+        $user->save();
+        return redirect()->route('users.index')->with('status', 'Nome do usuário atualizado com sucesso.');
+    }
+
     public function resetPasswordForm(Request $request, User $user): View
     {
         abort_unless($request->user()?->role === 'admin', 403);
