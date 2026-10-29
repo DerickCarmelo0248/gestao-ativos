@@ -146,7 +146,7 @@
                                     ->timezone('America/Sao_Paulo')
                                     ->format('d/m/Y') ?? '—' }}
                             </td>
-                            <td><a href="{{ route('users.password.edit', $user) }}">Redefinir senha</a></td>
+                            <td><a href="{{ route('users.name.edit', $user) }}">Editar nome</a> · <a href="{{ route('users.password.edit', $user) }}">Redefinir senha</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="5">Nenhum usuário encontrado.</td></tr>                    @endforelse
