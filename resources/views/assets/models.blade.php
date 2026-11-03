@@ -32,20 +32,20 @@
     </form>
     <p>{{ $models->total() }} modelo(s). Quantidades {{ empty($filters['unit_id']) ? 'somadas de todas as unidades' : 'da unidade selecionada' }}. Em descarte inclui equipamentos aguardando descarte e já na caçamba.</p>
     <div class="table-wrapper"><table>
-        <thead><tr><th>Modelo</th><th>Controle</th><th>Disponíveis</th><th>Em uso</th><th>Em descarte</th><th>Descartados</th><th>Consulta</th></tr></thead>
+        <thead><tr><th>Modelo</th><th>Controle</th><th>Disponíveis</th><th>Em uso</th><th>Em manutenção</th><th>Em descarte</th><th>Descartados</th><th>Consulta</th></tr></thead>
         <tbody>
         @forelse ($models as $model)
             @php($url = route($model->tracking_type === 'individual' ? 'assets.index' : 'stock-balances.index', array_filter(['item_id' => $model->id, 'unit_id' => $filters['unit_id'] ?? null])))
             <tr><td><a href="{{ $url }}">{{ $model->name }}</a><br><small>{{ $model->code }}{{ $model->is_active ? '' : ' · Inativo' }}</small></td>
                 <td>{{ $model->tracking_type === 'individual' ? 'Com patrimônio' : 'Quantidade' }}</td>
                 <td>{{ $model->available }}</td>
-                <td>{{ $model->tracking_type === 'individual' ? $model->in_use : '—' }}</td>
+                <td>{{ $model->tracking_type === 'individual' ? $model->in_use : '—' }}</td><td>{{ $model->tracking_type === 'individual' ? $model->maintenance : '—' }}</td>
                 <td>{{ $model->tracking_type === 'individual' ? $model->disposal : '—' }}</td>
                 <td>{{ $model->tracking_type === 'individual' ? $model->disposed : '—' }}</td>
                 <td><a href="{{ $url }}">{{ $model->tracking_type === 'individual' ? 'Ver patrimônios' : 'Ver saldos' }}</a></td>
             </tr>
         @empty
-            <tr><td colspan="7">Nenhum modelo encontrado.</td></tr>
+            <tr><td colspan="8">Nenhum modelo encontrado.</td></tr>
         @endforelse
         </tbody>
     </table></div>

@@ -108,6 +108,7 @@ class DashboardController extends Controller
 
         $eventLabels = [
             'adjustment_add' => 'Ajuste: acréscimo', 'adjustment_remove' => 'Ajuste: redução',
+            'maintenance_sent' => 'Envio para manutenção', 'maintenance_return' => 'Retorno de manutenção',
             'transfer_out' => 'Transferência enviada', 'transfer_in' => 'Transferência recebida',
             'entry' => 'Entrada', 'exit' => 'Saída', 'return' => 'Devolução',
             'replacement' => 'Reposição', 'container_entry' => 'Na caçamba',

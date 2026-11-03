@@ -101,7 +101,7 @@ class AssetController extends Controller
         Gate::authorize('viewAny', Asset::class);
 
         $filters = $request->validate([
-            'status' => ['nullable', 'in:available,in_use,awaiting_disposal,in_container,disposed'],
+            'status' => ['nullable', 'in:available,in_use,awaiting_disposal,in_container,disposed,maintenance'],
             'patrimony' => ['nullable', 'string', 'max:50'],
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
             'item_id' => ['nullable', 'integer', 'exists:items,id'],
@@ -146,7 +146,7 @@ class AssetController extends Controller
             ->get(['id', 'name']);
 
         $statuses = [
-            'available' => 'Disponível',
+            'maintenance' => 'Em manutenção', 'available' => 'Disponível',
             'in_use' => 'Em uso',
             'awaiting_disposal' => 'Aguardando descarte',
             'in_container' => 'Na caçamba',
@@ -165,6 +165,7 @@ class AssetController extends Controller
             ->when(! empty($filters['unit_id']), fn ($q) => $q->where('unit_id', $filters['unit_id']))
             ->selectRaw("COUNT(*) FILTER (WHERE status = 'available') AS available,
                 COUNT(*) FILTER (WHERE status = 'in_use') AS in_use,
+                COUNT(*) FILTER (WHERE status = 'maintenance') AS maintenance,
                 COUNT(*) FILTER (WHERE status IN ('awaiting_disposal', 'in_container')) AS disposal,
                 COUNT(*) FILTER (WHERE status = 'disposed') AS disposed")
             ->groupBy('item_id');
@@ -180,7 +181,7 @@ class AssetController extends Controller
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q->where('i.name', 'ilike', '%'.$search.'%')->orWhere('i.code', 'ilike', '%'.$search.'%')))
             ->select('i.id', 'i.name', 'i.code', 'i.tracking_type', 'i.is_active')
             ->selectRaw("CASE WHEN i.tracking_type = 'individual' THEN COALESCE(a.available, 0) ELSE COALESCE(s.quantity, 0) END AS available,
-                COALESCE(a.in_use, 0) AS in_use, COALESCE(a.disposal, 0) AS disposal, COALESCE(a.disposed, 0) AS disposed")
+                COALESCE(a.in_use, 0) AS in_use, COALESCE(a.maintenance, 0) AS maintenance, COALESCE(a.disposal, 0) AS disposal, COALESCE(a.disposed, 0) AS disposed")
             ->orderBy('i.name')->orderBy('i.id')->paginate(15)->withQueryString();
         $units = Unit::orderBy('name')->get(['id', 'name']);
         $categories = \App\Models\Category::orderBy('name')->get(['id', 'name']);
@@ -210,7 +211,7 @@ class AssetController extends Controller
         ->paginate(15);
 
     $statuses = [
-        'available' => 'Disponível',
+        'maintenance' => 'Em manutenção', 'available' => 'Disponível',
         'in_use' => 'Em uso',
         'awaiting_disposal' => 'Aguardando descarte',
         'in_container' => 'Na caçamba',
@@ -219,7 +220,7 @@ class AssetController extends Controller
 
     $movementTypes = [
         'transfer_out' => 'Transferência enviada', 'transfer_in' => 'Transferência recebida',
-            'entry' => 'Entrada',
+            'maintenance_sent' => 'Envio para manutenção', 'maintenance_return' => 'Retorno da manutenção', 'entry' => 'Entrada',
         'exit' => 'Saída',
         'replacement' => 'Reposição',
         'return' => 'Devolução',

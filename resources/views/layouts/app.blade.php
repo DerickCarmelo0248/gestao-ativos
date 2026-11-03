@@ -59,6 +59,8 @@
                 @can('viewAny', \App\Models\Asset::class)
                     <a class="nav-link {{ request()->routeIs('movements.exit-history') ? 'active' : '' }}" href="{{ route('movements.exit-history') }}">Histórico de saídas</a>
                     <a class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}" href="{{ route('transfers.index') }}">Transferência entre estoques</a>
+                    <a class="nav-link {{ request()->routeIs('maintenance.create') ? 'active' : '' }}" href="{{ route('maintenance.create') }}">Manutenção</a>
+                    <a class="nav-link {{ request()->routeIs('maintenance.index','maintenance.show') ? 'active' : '' }}" href="{{ route('maintenance.index') }}">Histórico de manutenções</a>
                 @endcan
                 @can('recordReturn', \App\Models\Asset::class)
                     <a
