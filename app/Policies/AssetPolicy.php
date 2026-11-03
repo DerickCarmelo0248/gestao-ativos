@@ -14,7 +14,7 @@ class AssetPolicy
 
     public function update(User $user, Asset $asset): bool
     {
-        return $user->role === 'admin' && ! in_array($asset->status, ['in_container', 'disposed'], true);
+        return $user->role === 'admin' && ! in_array($asset->status, ['maintenance', 'in_container', 'disposed'], true);
     }
 
     public function create(User $user): bool
