@@ -19,7 +19,7 @@ class AssetExportController extends Controller
             'item_id' => ['nullable', 'integer', 'exists:items,id'],
             'unit_id' => ['nullable', 'integer', 'exists:units,id'],
             'patrimony' => ['nullable', 'string', 'max:50'],
-            'status' => ['nullable', 'in:available,in_use,awaiting_disposal,in_container,disposed'],
+            'status' => ['nullable', 'in:available,in_use,awaiting_disposal,in_container,disposed,maintenance'],
         ]);
         $query = Asset::query()->with(['item', 'unit']);
         foreach (['item_id', 'unit_id', 'status', 'patrimony'] as $field) {
@@ -34,8 +34,8 @@ class AssetExportController extends Controller
                 'movements.destinationSector', 'movements.legacyDestinationUnit', 'movements.technician']);
         }
         $assets = $query->orderBy('patrimony')->orderBy('id')->get();
-        $statuses = ['available' => 'Disponível', 'in_use' => 'Em uso', 'awaiting_disposal' => 'Aguardando descarte', 'in_container' => 'Na caçamba', 'disposed' => 'Descartado'];
-        $types = ['entry' => 'Entrada', 'exit' => 'Saída', 'return' => 'Devolução', 'replacement' => 'Reposição', 'container_entry' => 'Entrada na caçamba', 'disposal' => 'Descarte'];
+        $statuses = ['maintenance' => 'Em manutenção', 'available' => 'Disponível', 'in_use' => 'Em uso', 'awaiting_disposal' => 'Aguardando descarte', 'in_container' => 'Na caçamba', 'disposed' => 'Descartado'];
+        $types = ['maintenance_sent' => 'Envio para manutenção', 'maintenance_return' => 'Retorno da manutenção', 'entry' => 'Entrada', 'exit' => 'Saída', 'return' => 'Devolução', 'replacement' => 'Reposição', 'container_entry' => 'Entrada na caçamba', 'disposal' => 'Descarte'];
         $summary = [
             'Modelo' => isset($filters['item_id']) ? \App\Models\Item::find($filters['item_id'])?->name : 'Todos',
             'Unidade' => isset($filters['unit_id']) ? \App\Models\Unit::find($filters['unit_id'])?->name : 'Todas',
