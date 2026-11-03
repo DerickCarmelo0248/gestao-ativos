@@ -35,6 +35,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/stock-balances/{stockBalance}/adjust', [StockBalanceController::class, 'adjust'])->whereNumber('stockBalance')->name('stock-balances.adjust');
     Route::get('/movements/exit-history/export', [\App\Http\Controllers\ExitHistoryController::class, 'export'])->name('movements.exit-history.export');
     Route::get('/movements/exit-history', [\App\Http\Controllers\ExitHistoryController::class, 'index'])->name('movements.exit-history');
+    Route::get('/maintenance', [\App\Http\Controllers\MaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::get('/maintenance/create', [\App\Http\Controllers\MaintenanceController::class, 'create'])->name('maintenance.create');
+    Route::post('/maintenance', [\App\Http\Controllers\MaintenanceController::class, 'store'])->name('maintenance.store');
+    Route::get('/maintenance/{maintenance}', [\App\Http\Controllers\MaintenanceController::class, 'show'])->whereNumber('maintenance')->name('maintenance.show');
+    Route::post('/maintenance/{maintenance}/return', [\App\Http\Controllers\MaintenanceController::class, 'returnEquipment'])->whereNumber('maintenance')->name('maintenance.return');
     Route::get('/transfers', [\App\Http\Controllers\InventoryTransferController::class, 'index'])->name('transfers.index');
     Route::post('/transfers', [\App\Http\Controllers\InventoryTransferController::class, 'store'])->name('transfers.store');
     Route::get('/movements/entry', [\App\Http\Controllers\MovementController::class, 'entry'])->name('movements.entry');
