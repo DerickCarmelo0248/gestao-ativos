@@ -54,6 +54,27 @@ class ItemManagementTest extends TestCase
             'code' => 'TEST-'.strtoupper(bin2hex(random_bytes(6))), 'name' => 'Item teste', 'tracking_type' => 'quantity']);
     }
 
+    public function test_code_suggestions_use_numeric_maximum_including_inactive_items(): void
+    {
+        $this->signIn('admin');
+        $prefix = 'SUG'.strtoupper(bin2hex(random_bytes(4)));
+        $category = $this->category();
+        foreach (['009', '099', '010'] as $suffix) {
+            $item = Item::create(['category_id'=>$category->id, 'code'=>$prefix.'-'.$suffix,
+                'name'=>'Sugestão teste', 'tracking_type'=>'quantity']);
+            if ($suffix === '099') {
+                $item->is_active = false;
+                $item->save();
+            }
+        }
+        $this->get(route('items.create'))->assertOk()
+            ->assertViewHas('lastItem', fn ($last) => $last->code === $prefix.'-010')
+            ->assertViewHas('codeSuggestions', function ($suggestions) use ($prefix) {
+                $suggestion = collect($suggestions)->firstWhere('prefix', $prefix);
+                return $suggestion->code === $prefix.'-099' && $suggestion->next_code === $prefix.'-100';
+            })->assertSee('value="'.$prefix.'-100"', false);
+    }
+
     public function test_admin_searches_and_updates_item_including_minimum(): void
     {
         $this->signIn('admin');

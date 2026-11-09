@@ -57,6 +57,19 @@
                         placeholder="MON-001"
                         required
                     >
+                    @if ($lastItem)
+                        <small>Último item cadastrado: <strong>{{ $lastItem->code }}</strong> — {{ $lastItem->name }}</small>
+                    @endif
+                    <label for="code-suggestion">Usar próximo código por prefixo</label>
+                    <select id="code-suggestion">
+                        <option value="">Selecione o prefixo (opcional)</option>
+                        @foreach ($codeSuggestions as $suggestion)
+                            @if (strlen($suggestion->next_code) <= 50)
+                                <option value="{{ $suggestion->next_code }}">{{ $suggestion->prefix }} — maior: {{ $suggestion->code }} → próximo: {{ $suggestion->next_code }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                    <small>A seleção preenche o código acima. Você pode editá-lo. A sugestão considera todos os itens, inclusive inativos, e será atualizada após cada cadastro.</small>
                 </p>
 
                 <p>
@@ -123,4 +136,13 @@
     
 
 </div>
+<script>
+document.getElementById('code-suggestion')?.addEventListener('change', function () {
+    if (this.value) {
+        const code = document.getElementById('code');
+        code.value = this.value;
+        code.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+});
+</script>
 @endsection
