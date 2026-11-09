@@ -79,7 +79,22 @@ class ItemController extends Controller
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return view('items.create', compact('categories'));
+        $lastItem = Item::orderByDesc('id')->first(['code', 'name']);
+        // Include inactive items and use the largest numeric suffix, not insertion order.
+        $codeSuggestions = DB::select(<<<'SQL'
+            SELECT DISTINCT ON (prefix) prefix, code,
+                prefix || '-' || lpad((number + 1)::text,
+                    GREATEST(length(suffix), length((number + 1)::text)), '0') AS next_code
+            FROM (
+                SELECT id, code, upper(regexp_replace(code, '-[0-9]+$', '')) AS prefix,
+                    substring(code FROM '([0-9]+)$') AS suffix,
+                    substring(code FROM '([0-9]+)$')::numeric AS number
+                FROM items WHERE code ~ '^.+-[0-9]+$'
+            ) codes
+            ORDER BY prefix, number DESC, length(suffix) DESC, id DESC
+            SQL);
+
+        return view('items.create', compact('categories', 'lastItem', 'codeSuggestions'));
     }
 
     public function store(StoreItemRequest $request): RedirectResponse
